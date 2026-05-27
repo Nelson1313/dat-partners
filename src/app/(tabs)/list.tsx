@@ -65,7 +65,7 @@ export default function ListScreen() {
 
     return (
         <View style={styles.container}>
-            {/* TOPBAR */}
+            {/* topbar */}
             <View style={styles.topbar}>
                 <View
                     style={
@@ -103,9 +103,9 @@ export default function ListScreen() {
                 </View>
             </View>
 
-            {/* CONTENT */}
+            {/* content */}
             <View style={styles.content}>
-                {/* HEADER */}
+                {/* header */}
                 <View
                     style={
                         styles.headerRow
@@ -131,7 +131,7 @@ export default function ListScreen() {
                     </Text>
                 </View>
 
-                {/* SEARCH */}
+                {/* search */}
                 <TextInput
                     placeholder="Keresés név vagy cím alapján..."
                     placeholderTextColor="#94A3B8"
@@ -144,7 +144,7 @@ export default function ListScreen() {
                     }
                 />
 
-                {/* LIST */}
+                {/* list */}
                 <FlatList
                     data={
                         filteredPartners

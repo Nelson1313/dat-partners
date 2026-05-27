@@ -50,7 +50,7 @@ export default function WebMap({
             3.2,
     };
 
-    // később sidebar/list click zoom
+    // late sidebar/click zoom
     useEffect(() => {
         if (
             !selectedPartnerId

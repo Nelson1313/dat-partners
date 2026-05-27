@@ -26,9 +26,7 @@ type WebMapLeafletProps = {
     selectedPartnerId?: string | null;
 };
 
-/* =========================
-   MARKER ICON
-========================= */
+/* marker icon */
 
 const customIcon = L.icon({
     iconUrl:
@@ -39,16 +37,14 @@ const customIcon = L.icon({
 
     iconSize: [28, 42],
 
-    /* pin hegye */
+    /* pin edge */
     iconAnchor: [14, 42],
 
-    /* popup feljebb */
+    /* popup up */
     popupAnchor: [0, -40],
 });
 
-/* =========================
-   MAP CONTROLLER
-========================= */
+/* map controller */
 
 function MapController({
     selectedPartner,
@@ -117,9 +113,7 @@ function MapController({
     return null;
 }
 
-/* =========================
-   COMPONENT
-========================= */
+/* component */
 
 export default function WebMapLeaflet({
     selectedPartnerId,
@@ -203,7 +197,7 @@ export default function WebMapLeaflet({
                                     )
                                         ._map as L.Map;
 
-                                /* előző popup bezár */
+                                /* previous popup close */
                                 map.closePopup();
 
                                 map.flyTo(
@@ -252,7 +246,7 @@ export default function WebMapLeaflet({
                                     }
                                 </div>
 
-                                {/* PHONE */}
+                                {/* phone */}
                                 {partner.phone && (
                                     <a
                                         className="popup-action popup-phone"
@@ -273,7 +267,7 @@ export default function WebMapLeaflet({
                                     </a>
                                 )}
 
-                                {/* EMAIL */}
+                                {/* email */}
                                 {partner.email && (
                                     <a
                                         className="popup-action popup-email"
@@ -291,7 +285,7 @@ export default function WebMapLeaflet({
                                     </a>
                                 )}
 
-                                {/* ROUTE */}
+                                {/* route */}
                                 <a
                                     className="popup-route"
                                     href={`https://www.google.com/maps/dir/?api=1&destination=${partner.latitude},${partner.longitude}`}

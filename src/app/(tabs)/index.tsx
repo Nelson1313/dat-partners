@@ -24,9 +24,9 @@ export default function MapScreen() {
 
   return (
     <View style={styles.container}>
-      {/* SIDEBAR */}
+      {/* sidebar */}
       <View style={styles.sidebar}>
-        {/* Header */}
+        {/* header */}
         <View style={styles.brandSection}>
           <View style={styles.brandDot} />
 
@@ -45,14 +45,14 @@ export default function MapScreen() {
           </View>
         </View>
 
-        {/* Header */}
+        {/* header */}
         <View style={styles.listHeader}>
           <Text style={styles.listTitle}>
             Partnerek
           </Text>
         </View>
 
-        {/* Partner List */}
+        {/* partner list */}
         <ScrollView
           showsVerticalScrollIndicator={
             false
@@ -137,12 +137,12 @@ export default function MapScreen() {
         </ScrollView>
       </View>
 
-      {/* MAIN */}
+      {/* main */}
       <View style={styles.main}>
-        {/* TOPBAR */}
+        {/* topbar */}
         <View style={styles.topbar}>
           <View style={styles.segmented}>
-            {/* MAP */}
+            {/* map */}
             <TouchableOpacity
               style={styles.activeTab}
               activeOpacity={0.85}
@@ -156,7 +156,7 @@ export default function MapScreen() {
               </Text>
             </TouchableOpacity>
 
-            {/* LIST */}
+            {/* list */}
             <TouchableOpacity
               activeOpacity={0.75}
               onPress={() =>
@@ -172,7 +172,7 @@ export default function MapScreen() {
           </View>
         </View>
 
-        {/* MAP */}
+        {/* map */}
         <View
           style={
             styles.mapContainer

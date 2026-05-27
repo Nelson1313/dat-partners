@@ -71,7 +71,7 @@ export default function PartnerDetail() {
 
     return (
         <View style={styles.container}>
-            {/* BACK */}
+            {/* back */}
             <TouchableOpacity
                 style={styles.backButton}
                 onPress={() =>
@@ -87,7 +87,7 @@ export default function PartnerDetail() {
                 </Text>
             </TouchableOpacity>
 
-            {/* CARD */}
+            {/* card */}
             <View style={styles.card}>
                 <Text
                     style={
@@ -105,7 +105,7 @@ export default function PartnerDetail() {
                     Partner adatok
                 </Text>
 
-                {/* ADDRESS */}
+                {/* address */}
                 <View
                     style={
                         styles.infoCard
@@ -130,7 +130,7 @@ export default function PartnerDetail() {
                     </Text>
                 </View>
 
-                {/* PHONE */}
+                {/* phone */}
                 {!!partner.phone && (
                     <TouchableOpacity
                         style={[
@@ -161,7 +161,7 @@ export default function PartnerDetail() {
                     </TouchableOpacity>
                 )}
 
-                {/* EMAIL */}
+                {/* email */}
                 {!!partner.email && (
                     <TouchableOpacity
                         style={[
@@ -192,7 +192,7 @@ export default function PartnerDetail() {
                     </TouchableOpacity>
                 )}
 
-                {/* BUTTONS */}
+                {/* buttons */}
                 <TouchableOpacity
                     style={
                         styles.routeButton

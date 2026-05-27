@@ -16,7 +16,7 @@ body,
   height: 100%;
 }
 
-/* ===== MAP ===== */
+/* map */
 
 .leaflet-container {
   width: 100%;
@@ -67,7 +67,7 @@ body,
   transform: scale(1.03);
 }
 
-/* ===== POPUP ===== */
+/* popup*/
 
 .leaflet-popup {
   margin-bottom: 68px !important;
@@ -77,7 +77,7 @@ body,
   border-radius: 28px !important;
   background: rgba(255, 255, 255, .98) !important;
 
-  /* finom kék outline */
+  /* outline */
   border: 3px solid rgba(0, 0, 0, 0.4) !important;
 
   /* layered shadow */
@@ -105,7 +105,7 @@ body,
   display: none !important;
 }
 
-/* ===== CONTENT ===== */
+/* content */
 
 .popup-card {
   display: flex;
@@ -137,7 +137,7 @@ body,
   flex-shrink: 0;
 }
 
-/* ===== ACTIONS ===== */
+/* actions */
 
 .popup-action {
   display: flex;
@@ -206,7 +206,7 @@ body,
   font-weight: 700;
 }
 
-/* ===== ROUTE BUTTON ===== */
+/* route button */
 
 .popup-route {
   margin-top: 12px;

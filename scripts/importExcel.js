@@ -6,7 +6,7 @@ async function geocodeAddress(address) {
     try {
         const cleanedAddress = String(address)
             .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "") // ékezet eltávolítás
+            .replace(/[\u0300-\u036f]/g, "")
             .replace(/\./g, "")
             .replace(/\bu\b/g, "utca")
             .replace(/\but\b/g, "ut")
@@ -140,7 +140,6 @@ async function run() {
                 coords.longitude,
         });
 
-        // rate limit
         await new Promise((resolve) =>
             setTimeout(resolve, 1200)
         );
