@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import {
     FlatList,
     StyleSheet,
@@ -8,9 +8,22 @@ import {
     View,
 } from "react-native";
 
-import { useMemo, useState } from "react";
+import {
+    Mail,
+    MapPin,
+    Phone,
+} from "lucide-react";
 
-import { partners } from "../../../data/partners";
+import {
+    usePartnersStore,
+} from "../../store/partnersStore";
+
+
+import {
+    useCallback,
+    useMemo,
+    useState
+} from "react";
 
 import {
     setSelectedPartner,
@@ -19,6 +32,23 @@ import {
 export default function ListScreen() {
     const [search, setSearch] =
         useState("");
+
+    const {
+        partners,
+        fetchPartners,
+    } =
+        usePartnersStore();
+
+    useFocusEffect(
+        useCallback(() => {
+            const load =
+                async () => {
+                    await fetchPartners();
+                };
+
+            load();
+        }, [])
+    );
 
     const filteredPartners =
         useMemo(() => {
@@ -61,7 +91,10 @@ export default function ListScreen() {
                         );
                     }
                 );
-        }, [search]);
+        }, [
+            search,
+            partners,
+        ]);
 
     return (
         <View style={styles.container}>
@@ -208,42 +241,41 @@ export default function ListScreen() {
                                     }
                                 </Text>
 
-                                <Text
-                                    style={
-                                        styles.address
-                                    }
-                                >
-                                    📍{" "}
-                                    {
-                                        item.address
-                                    }
-                                </Text>
+                                <View style={styles.infoRow}>
+                                    <MapPin
+                                        size={16}
+                                        color="#009DDF"
+                                        strokeWidth={2.4}
+                                    />
 
-                                {!!item.phone && (
-                                    <Text
-                                        style={
-                                            styles.meta
-                                        }
-                                    >
-                                        📞{" "}
-                                        {
-                                            item.phone
-                                        }
+                                    <Text style={styles.infoText}>
+                                        {item.address}
                                     </Text>
-                                )}
+                                </View>
 
-                                {!!item.email && (
-                                    <Text
-                                        style={
-                                            styles.meta
-                                        }
-                                    >
-                                        ✉️{" "}
-                                        {
-                                            item.email
-                                        }
+                                <View style={styles.infoRow}>
+                                    <Phone
+                                        size={16}
+                                        color="#EC4899"
+                                        strokeWidth={2.4}
+                                    />
+
+                                    <Text style={styles.infoText}>
+                                        {item.phone}
                                     </Text>
-                                )}
+                                </View>
+
+                                <View style={styles.infoRow}>
+                                    <Mail
+                                        size={16}
+                                        color="#8B5CF6"
+                                        strokeWidth={2.4}
+                                    />
+
+                                    <Text style={styles.infoText}>
+                                        {item.email}
+                                    </Text>
+                                </View>
                             </View>
                         </TouchableOpacity>
                     )}
@@ -397,5 +429,17 @@ const styles =
                 "#FAFCFE",
             borderColor:
                 "#E6EDF5",
+        },
+        infoRow: {
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+            marginTop: 8,
+        },
+
+        infoText: {
+            color: "#64748B",
+            fontSize: 14,
+            fontWeight: "500",
         },
     });

@@ -7,32 +7,51 @@ import {
     View,
 } from "react-native";
 
-import { partners } from "../../../data/partners";
+import {
+    usePartnersStore,
+} from "../../store/partnersStore";
+
+import {
+    Mail,
+    MapPin,
+    Navigation,
+    Phone,
+} from "lucide-react";
+import { useEffect } from "react";
+
 
 export default function PartnerDetail() {
     const { id } =
         useLocalSearchParams();
 
+    const {
+        partners,
+        fetchPartners,
+    } =
+        usePartnersStore();
+
+    useEffect(() => {
+        fetchPartners();
+    }, []);
+
     const partner =
         partners.find(
-            (p) => p.id === id
+            (p) =>
+                String(p.id) ===
+                String(id)
         );
+
+    if (
+        partners.length === 0
+    ) {
+        return null;
+    }
 
     if (!partner) {
         return (
-            <View
-                style={
-                    styles.emptyContainer
-                }
-            >
-                <Text
-                    style={
-                        styles.emptyText
-                    }
-                >
-                    Partner nem található
-                </Text>
-            </View>
+            <Text>
+                Partner nem található
+            </Text>
         );
     }
 
@@ -111,23 +130,44 @@ export default function PartnerDetail() {
                         styles.infoCard
                     }
                 >
-                    <Text
-                        style={
-                            styles.label
-                        }
-                    >
-                        📍 Cím
-                    </Text>
+                    <View style={styles.row}>
+                        <View
+                            style={[
+                                styles.iconWrap,
+                                styles.locationIcon,
+                            ]}
+                        >
+                            <MapPin
+                                size={18}
+                                color="#009DDF"
+                                strokeWidth={2.4}
+                            />
+                        </View>
 
-                    <Text
-                        style={
-                            styles.value
-                        }
-                    >
-                        {
-                            partner.address
-                        }
-                    </Text>
+                        <View
+                            style={
+                                styles.infoContent
+                            }
+                        >
+                            <Text
+                                style={
+                                    styles.label
+                                }
+                            >
+                                Cím
+                            </Text>
+
+                            <Text
+                                style={
+                                    styles.value
+                                }
+                            >
+                                {
+                                    partner.address
+                                }
+                            </Text>
+                        </View>
+                    </View>
                 </View>
 
                 {/* phone */}
@@ -141,23 +181,44 @@ export default function PartnerDetail() {
                             callPartner
                         }
                     >
-                        <Text
-                            style={
-                                styles.label
-                            }
-                        >
-                            📞 Telefon
-                        </Text>
+                        <View style={styles.row}>
+                            <View
+                                style={[
+                                    styles.iconWrap,
+                                    styles.phoneIcon,
+                                ]}
+                            >
+                                <Phone
+                                    size={18}
+                                    color="#EC4899"
+                                    strokeWidth={2.4}
+                                />
+                            </View>
 
-                        <Text
-                            style={
-                                styles.value
-                            }
-                        >
-                            {
-                                partner.phone
-                            }
-                        </Text>
+                            <View
+                                style={
+                                    styles.infoContent
+                                }
+                            >
+                                <Text
+                                    style={
+                                        styles.label
+                                    }
+                                >
+                                    Telefon
+                                </Text>
+
+                                <Text
+                                    style={
+                                        styles.value
+                                    }
+                                >
+                                    {
+                                        partner.phone
+                                    }
+                                </Text>
+                            </View>
+                        </View>
                     </TouchableOpacity>
                 )}
 
@@ -172,23 +233,44 @@ export default function PartnerDetail() {
                             sendEmail
                         }
                     >
-                        <Text
-                            style={
-                                styles.label
-                            }
-                        >
-                            ✉️ Email
-                        </Text>
+                        <View style={styles.row}>
+                            <View
+                                style={[
+                                    styles.iconWrap,
+                                    styles.emailIcon,
+                                ]}
+                            >
+                                <Mail
+                                    size={18}
+                                    color="#8B5CF6"
+                                    strokeWidth={2.4}
+                                />
+                            </View>
 
-                        <Text
-                            style={
-                                styles.value
-                            }
-                        >
-                            {
-                                partner.email
-                            }
-                        </Text>
+                            <View
+                                style={
+                                    styles.infoContent
+                                }
+                            >
+                                <Text
+                                    style={
+                                        styles.label
+                                    }
+                                >
+                                    Email
+                                </Text>
+
+                                <Text
+                                    style={
+                                        styles.value
+                                    }
+                                >
+                                    {
+                                        partner.email
+                                    }
+                                </Text>
+                            </View>
+                        </View>
                     </TouchableOpacity>
                 )}
 
@@ -201,13 +283,25 @@ export default function PartnerDetail() {
                         openMaps
                     }
                 >
-                    <Text
+                    <View
                         style={
-                            styles.routeButtonText
+                            styles.routeRow
                         }
                     >
-                        Útvonalterv
-                    </Text>
+                        <Navigation
+                            size={18}
+                            color="#FFF"
+                            strokeWidth={2.5}
+                        />
+
+                        <Text
+                            style={
+                                styles.routeButtonText
+                            }
+                        >
+                            Útvonalterv
+                        </Text>
+                    </View>
                 </TouchableOpacity>
             </View>
         </View>
@@ -220,7 +314,7 @@ const styles =
             flex: 1,
             backgroundColor:
                 "#F6F8FB",
-            padding: 28,
+            padding: 18,
         },
 
         emptyContainer: {
@@ -251,8 +345,8 @@ const styles =
         card: {
             backgroundColor:
                 "#FFFFFF",
-            borderRadius: 34,
-            padding: 30,
+            borderRadius: 28,
+            padding: 22,
             borderWidth: 1,
             borderColor:
                 "#E9EEF4",
@@ -270,7 +364,7 @@ const styles =
         },
 
         partnerName: {
-            fontSize: 34,
+            fontSize: 26,
             fontWeight: "800",
             color: "#0F172A",
             marginBottom: 6,
@@ -285,8 +379,8 @@ const styles =
         infoCard: {
             backgroundColor:
                 "#F8FAFC",
-            borderRadius: 24,
-            padding: 22,
+            borderRadius: 20,
+            padding: 16,
             marginBottom: 16,
             borderWidth: 1,
             borderColor:
@@ -334,5 +428,46 @@ const styles =
             color: "#FFF",
             fontSize: 17,
             fontWeight: "800",
+        },
+
+        row: {
+            flexDirection: "row",
+            alignItems: "center",
+        },
+
+        infoContent: {
+            flex: 1,
+        },
+
+        iconWrap: {
+            width: 48,
+            height: 48,
+            borderRadius: 16,
+            justifyContent:
+                "center",
+            alignItems:
+                "center",
+            marginRight: 14,
+        },
+
+        locationIcon: {
+            backgroundColor:
+                "rgba(0,157,223,.10)",
+        },
+
+        phoneIcon: {
+            backgroundColor:
+                "rgba(236,72,153,.10)",
+        },
+
+        emailIcon: {
+            backgroundColor:
+                "rgba(139,92,246,.10)",
+        },
+
+        routeRow: {
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
         },
     });

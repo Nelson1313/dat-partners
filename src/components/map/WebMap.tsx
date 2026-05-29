@@ -13,27 +13,34 @@ import {
     View,
 } from "react-native";
 
-import { partners } from "../../../data/partners";
+import {
+    usePartnersStore,
+} from "../../store/partnersStore";
 
 type Props = {
-    selectedPartnerId?: string | null;
-};
-
-type Partner = {
-    id: string;
-    name: string;
-    address: string;
-    phone?: string;
-    email?: string;
-    latitude: number;
-    longitude: number;
+    selectedPartner?:
+    | {
+        id: string;
+        name: string;
+        address: string;
+        phone: string;
+        email: string;
+        latitude: number;
+        longitude: number;
+    }
+    | null;
 };
 
 export default function WebMap({
-    selectedPartnerId,
+    selectedPartner,
 }: Props) {
     const mapRef =
         useRef<MapView>(null);
+
+    const {
+        partners,
+    } =
+        usePartnersStore();
 
     const initialRegion: Region =
     {
@@ -50,32 +57,26 @@ export default function WebMap({
             3.2,
     };
 
-    // late sidebar/click zoom
+    // sidebar click → zoom
     useEffect(() => {
         if (
-            !selectedPartnerId
+            !selectedPartner ||
+            !mapRef.current
         )
             return;
 
-        const partner =
-            partners.find(
-                (
-                    p: Partner
-                ) =>
-                    p.id ===
-                    selectedPartnerId
-            );
+        console.log(
+            "ZOOMING TO:",
+            selectedPartner.name
+        );
 
-        if (!partner)
-            return;
-
-        mapRef.current?.animateToRegion(
+        mapRef.current.animateToRegion(
             {
                 latitude:
-                    partner.latitude,
+                    selectedPartner.latitude,
 
                 longitude:
-                    partner.longitude,
+                    selectedPartner.longitude,
 
                 latitudeDelta:
                     0.02,
@@ -83,10 +84,10 @@ export default function WebMap({
                 longitudeDelta:
                     0.02,
             },
-            600
+            900
         );
     }, [
-        selectedPartnerId,
+        selectedPartner,
     ]);
 
     return (
@@ -107,7 +108,7 @@ export default function WebMap({
             >
                 {partners.map(
                     (
-                        partner: Partner
+                        partner
                     ) => (
                         <Marker
                             key={

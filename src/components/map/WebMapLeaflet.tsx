@@ -1,4 +1,9 @@
-import { useEffect, useMemo, useRef } from "react";
+import {
+    useEffect,
+    useMemo,
+    useRef,
+} from "react";
+
 import {
     MapContainer,
     Marker,
@@ -7,10 +12,15 @@ import {
     useMap,
 } from "react-leaflet";
 
+import {
+    Mail,
+    MapPin,
+    Navigation,
+    Phone,
+} from "lucide-react";
+
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-
-import { partners } from "../../../data/partners";
 
 type Partner = {
     id: string;
@@ -22,11 +32,10 @@ type Partner = {
     email?: string;
 };
 
-type WebMapLeafletProps = {
-    selectedPartnerId?: string | null;
+type Props = {
+    partners: Partner[];
+    selectedPartner?: Partner | null;
 };
-
-/* marker icon */
 
 const customIcon = L.icon({
     iconUrl:
@@ -36,15 +45,9 @@ const customIcon = L.icon({
         "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 
     iconSize: [28, 42],
-
-    /* pin edge */
     iconAnchor: [14, 42],
-
-    /* popup up */
     popupAnchor: [0, -40],
 });
-
-/* map controller */
 
 function MapController({
     selectedPartner,
@@ -52,14 +55,21 @@ function MapController({
 }: {
     selectedPartner?: Partner | null;
     markerRefs: React.MutableRefObject<
-        Record<string, L.Marker | null>
+        Record<
+            string,
+            L.Marker | null
+        >
     >;
 }) {
-    const map = useMap();
+    const map =
+        useMap();
 
-    /* sidebar click */
+    // sidebar click
     useEffect(() => {
-        if (!selectedPartner) return;
+        if (
+            !selectedPartner
+        )
+            return;
 
         map.flyTo(
             [
@@ -77,25 +87,31 @@ function MapController({
             selectedPartner.id
             ];
 
-        map.once("moveend", () => {
-            marker?.openPopup();
-        });
+        map.once(
+            "moveend",
+            () => {
+                marker?.openPopup();
+            }
+        );
     }, [
         selectedPartner,
         map,
         markerRefs,
     ]);
 
-    /* zoom out -> popup close */
+    // zoom out popup close
     useEffect(() => {
-        const handleZoom = () => {
-            const zoom =
-                map.getZoom();
+        const handleZoom =
+            () => {
+                const zoom =
+                    map.getZoom();
 
-            if (zoom < 17) {
-                map.closePopup();
-            }
-        };
+                if (
+                    zoom < 17
+                ) {
+                    map.closePopup();
+                }
+            };
 
         map.on(
             "zoomend",
@@ -113,11 +129,10 @@ function MapController({
     return null;
 }
 
-/* component */
-
 export default function WebMapLeaflet({
-    selectedPartnerId,
-}: WebMapLeafletProps) {
+    partners,
+    selectedPartner,
+}: Props) {
     const markerRefs = useRef<
         Record<string, L.Marker | null>
     >({});
@@ -128,20 +143,8 @@ export default function WebMapLeaflet({
                 (partner) =>
                     partner.latitude &&
                     partner.longitude
-            ) as Partner[];
-        }, []);
-
-    const selectedPartner =
-        useMemo(() => {
-            return validPartners.find(
-                (partner) =>
-                    partner.id ===
-                    selectedPartnerId
             );
-        }, [
-            validPartners,
-            selectedPartnerId,
-        ]);
+        }, [partners]);
 
     return (
         <MapContainer
@@ -151,18 +154,16 @@ export default function WebMapLeaflet({
                 height: "100%",
                 width: "100%",
             }}
-            zoomControl
         >
-            <TileLayer
-                attribution=""
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
             <MapController
                 selectedPartner={
                     selectedPartner
                 }
-                markerRefs={markerRefs}
+                markerRefs={
+                    markerRefs
+                }
             />
 
             {validPartners.map(
@@ -174,9 +175,7 @@ export default function WebMapLeaflet({
                             partner.longitude,
                         ]}
                         icon={customIcon}
-                        ref={(
-                            ref: L.Marker | null
-                        ) => {
+                        ref={(ref) => {
                             markerRefs.current[
                                 partner.id
                             ] = ref;
@@ -194,12 +193,12 @@ export default function WebMapLeaflet({
                                 const map =
                                     (
                                         marker as any
-                                    )
-                                        ._map as L.Map;
+                                    )._map as L.Map;
 
-                                /* previous popup close */
+                                // bezárjuk az előző popupot
                                 map.closePopup();
 
+                                // zoom partnerre
                                 map.flyTo(
                                     [
                                         partner.latitude,
@@ -207,10 +206,11 @@ export default function WebMapLeaflet({
                                     ],
                                     17,
                                     {
-                                        duration: 0.6,
+                                        duration: 0.7,
                                     }
                                 );
 
+                                // popup nyitás zoom után
                                 map.once(
                                     "moveend",
                                     () => {
@@ -234,19 +234,23 @@ export default function WebMapLeaflet({
                         >
                             <div className="popup-card">
                                 <div className="popup-title">
-                                    {
-                                        partner.name
-                                    }
+                                    {partner.name}
                                 </div>
 
                                 <div className="popup-address">
-                                    <span className="popup-dot" />
-                                    {
-                                        partner.address
-                                    }
+                                    <div className="popup-icon location">
+                                        <MapPin
+                                            size={18}
+                                            color="#009DDF"
+                                            strokeWidth={2.4}
+                                        />
+                                    </div>
+
+                                    <span className="popup-address-text">
+                                        {partner.address}
+                                    </span>
                                 </div>
 
-                                {/* phone */}
                                 {partner.phone && (
                                     <a
                                         className="popup-action popup-phone"
@@ -255,44 +259,54 @@ export default function WebMapLeaflet({
                                             ""
                                         )}`}
                                     >
-                                        <div className="popup-icon">
-                                            📞
+                                        <div className="popup-icon phone">
+                                            <Phone
+                                                size={18}
+                                                color="#EC4899"
+                                                strokeWidth={2.4}
+                                            />
                                         </div>
 
                                         <span>
-                                            {
-                                                partner.phone
-                                            }
+                                            {partner.phone}
                                         </span>
                                     </a>
                                 )}
 
-                                {/* email */}
                                 {partner.email && (
                                     <a
                                         className="popup-action popup-email"
                                         href={`mailto:${partner.email}`}
                                     >
-                                        <div className="popup-icon">
-                                            ✉️
+                                        <div className="popup-icon email">
+                                            <Mail
+                                                size={18}
+                                                color="#8B5CF6"
+                                                strokeWidth={2.4}
+                                            />
                                         </div>
 
                                         <span>
-                                            {
-                                                partner.email
-                                            }
+                                            {partner.email}
                                         </span>
                                     </a>
                                 )}
 
-                                {/* route */}
                                 <a
                                     className="popup-route"
                                     href={`https://www.google.com/maps/dir/?api=1&destination=${partner.latitude},${partner.longitude}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    Útvonalterv
+                                    <Navigation
+                                        size={18}
+                                        color="#fff"
+                                        strokeWidth={2.4}
+                                    />
+
+                                    <span>
+                                        Útvonalterv
+                                    </span>
                                 </a>
                             </div>
                         </Popup>

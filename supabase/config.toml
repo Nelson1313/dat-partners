@@ -1,0 +1,33 @@
+
+[functions.geocode-partner]
+enabled = true
+verify_jwt = false
+import_map = "./functions/geocode-partner/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/geocode-partner/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/geocode-partner/*.html" ]
+
+[functions.update-partner]
+enabled = true
+verify_jwt = false
+import_map = "./functions/update-partner/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/update-partner/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/update-partner/*.html" ]
+
+[functions.delete-partner]
+enabled = true
+verify_jwt = false
+import_map = "./functions/delete-partner/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/delete-partner/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/delete-partner/*.html" ]
