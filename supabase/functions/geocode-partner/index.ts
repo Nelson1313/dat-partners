@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std/http/server.ts";
 
 import {
-  createClient,
+    createClient,
 } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -113,7 +113,7 @@ serve(async (req) => {
           headers:
           {
             "User-Agent":
-              "AVILOO-Partner-Locator/1.0",
+              "AVILOO-javito-Locator/1.0",
           },
         }
       );
@@ -154,7 +154,7 @@ serve(async (req) => {
     } =
       await supabase
         .from(
-          "partners"
+          "javitos"
         )
         .insert({
           name,

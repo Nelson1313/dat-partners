@@ -8,8 +8,8 @@ import {
 } from "react-native";
 
 import {
-    usePartnersStore,
-} from "../../store/partnersStore";
+    useJavitosStore,
+} from "../../store/javitosStore";
 
 import {
     Mail,
@@ -20,37 +20,37 @@ import {
 import { useEffect } from "react";
 
 
-export default function PartnerDetail() {
+export default function javitoDetail() {
     const { id } =
         useLocalSearchParams();
 
     const {
-        partners,
-        fetchPartners,
+        javitos,
+        fetchJavitos,
     } =
-        usePartnersStore();
+        useJavitosStore();
 
     useEffect(() => {
-        fetchPartners();
+        fetchJavitos();
     }, []);
 
-    const partner =
-        partners.find(
+    const javito =
+        javitos.find(
             (p) =>
                 String(p.id) ===
                 String(id)
         );
 
     if (
-        partners.length === 0
+        javitos.length === 0
     ) {
         return null;
     }
 
-    if (!partner) {
+    if (!javito) {
         return (
             <Text>
-                Partner nem található
+                javito nem található
             </Text>
         );
     }
@@ -58,7 +58,7 @@ export default function PartnerDetail() {
     const openMaps = () => {
         const query =
             encodeURIComponent(
-                partner.address
+                javito.address
             );
 
         Linking.openURL(
@@ -66,13 +66,13 @@ export default function PartnerDetail() {
         );
     };
 
-    const callPartner =
+    const calljavito =
         () => {
             if (
-                partner.phone
+                javito.phone
             ) {
                 Linking.openURL(
-                    `tel:${partner.phone}`
+                    `tel:${javito.phone}`
                 );
             }
         };
@@ -80,10 +80,10 @@ export default function PartnerDetail() {
     const sendEmail =
         () => {
             if (
-                partner.email
+                javito.email
             ) {
                 Linking.openURL(
-                    `mailto:${partner.email}`
+                    `mailto:${javito.email}`
                 );
             }
         };
@@ -110,10 +110,10 @@ export default function PartnerDetail() {
             <View style={styles.card}>
                 <Text
                     style={
-                        styles.partnerName
+                        styles.javitoName
                     }
                 >
-                    {partner.name}
+                    {javito.name}
                 </Text>
 
                 <Text
@@ -121,7 +121,7 @@ export default function PartnerDetail() {
                         styles.subtitle
                     }
                 >
-                    Partner adatok
+                    javito adatok
                 </Text>
 
                 {/* address */}
@@ -139,7 +139,7 @@ export default function PartnerDetail() {
                         >
                             <MapPin
                                 size={18}
-                                color="#009DDF"
+                                color="#003B7A"
                                 strokeWidth={2.4}
                             />
                         </View>
@@ -163,7 +163,7 @@ export default function PartnerDetail() {
                                 }
                             >
                                 {
-                                    partner.address
+                                    javito.address
                                 }
                             </Text>
                         </View>
@@ -171,14 +171,14 @@ export default function PartnerDetail() {
                 </View>
 
                 {/* phone */}
-                {!!partner.phone && (
+                {!!javito.phone && (
                     <TouchableOpacity
                         style={[
                             styles.infoCard,
                             styles.phoneCard,
                         ]}
                         onPress={
-                            callPartner
+                            calljavito
                         }
                     >
                         <View style={styles.row}>
@@ -214,7 +214,7 @@ export default function PartnerDetail() {
                                     }
                                 >
                                     {
-                                        partner.phone
+                                        javito.phone
                                     }
                                 </Text>
                             </View>
@@ -223,7 +223,7 @@ export default function PartnerDetail() {
                 )}
 
                 {/* email */}
-                {!!partner.email && (
+                {!!javito.email && (
                     <TouchableOpacity
                         style={[
                             styles.infoCard,
@@ -266,7 +266,7 @@ export default function PartnerDetail() {
                                     }
                                 >
                                     {
-                                        partner.email
+                                        javito.email
                                     }
                                 </Text>
                             </View>
@@ -339,7 +339,7 @@ const styles =
         backText: {
             fontSize: 16,
             fontWeight: "700",
-            color: "#0F172A",
+            color: "#003B7A",
         },
 
         card: {
@@ -363,10 +363,10 @@ const styles =
             elevation: 10,
         },
 
-        partnerName: {
+        javitoName: {
             fontSize: 26,
             fontWeight: "800",
-            color: "#0F172A",
+            color: "#003B7A",
             marginBottom: 6,
         },
 
@@ -410,7 +410,7 @@ const styles =
 
         value: {
             fontSize: 18,
-            color: "#0F172A",
+            color: "#003B7A",
             fontWeight: "700",
         },
 
@@ -421,7 +421,7 @@ const styles =
             alignItems: "center",
 
             backgroundColor:
-                "#009DDF",
+                "#003B7A",
         },
 
         routeButtonText: {

@@ -13,7 +13,7 @@ export default function RootLayout() {
       />
 
       <Stack.Screen
-        name="partner/[id]"
+        name="javito/[id]"
         options={{
           headerShown: false,
         }}

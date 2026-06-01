@@ -1,21 +1,21 @@
-let selectedPartnerId:
+let selectedjavitoId:
     string | null = null;
 
 const listeners =
     new Set<() => void>();
 
-export function setSelectedPartner(
+export function setSelectedjavito(
     id: string
 ) {
-    selectedPartnerId = id;
+    selectedjavitoId = id;
 
     listeners.forEach((cb) =>
         cb()
     );
 }
 
-export function getSelectedPartner() {
-    return selectedPartnerId;
+export function getSelectedjavito() {
+    return selectedjavitoId;
 }
 
 export function subscribe(

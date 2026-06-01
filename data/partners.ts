@@ -1,5 +1,5 @@
 
-export const partners = [
+export const javitos = [
   {
     "id": "1",
     "name": "LUMO Networks Kft.",

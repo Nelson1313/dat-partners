@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "aviloo-partner-map",
-    "slug": "aviloo-partner-map",
+    "name": "DAT javito Hálózat",
+    "slug": "dat-javito-halozat",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "aviloopartnermap",
+    "scheme": "dat-javito-halozat",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.zuhn13.aviloopartnermap",
+      "bundleIdentifier": "com.zuhn13.datjavitohalozat",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -22,7 +22,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.zuhn13.aviloopartnermap"
+      "package": "com.zuhn13.datjavitohalozat"
     },
     "web": {
       "output": "static",

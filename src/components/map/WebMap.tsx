@@ -14,11 +14,11 @@ import {
 } from "react-native";
 
 import {
-    usePartnersStore,
-} from "../../store/partnersStore";
+    useJavitosStore,
+} from "../../store/javitosStore";
 
 type Props = {
-    selectedPartner?:
+    selectedjavito?:
     | {
         id: string;
         name: string;
@@ -32,15 +32,15 @@ type Props = {
 };
 
 export default function WebMap({
-    selectedPartner,
+    selectedjavito,
 }: Props) {
     const mapRef =
         useRef<MapView>(null);
 
     const {
-        partners,
+        javitos,
     } =
-        usePartnersStore();
+        useJavitosStore();
 
     const initialRegion: Region =
     {
@@ -60,23 +60,23 @@ export default function WebMap({
     // sidebar click → zoom
     useEffect(() => {
         if (
-            !selectedPartner ||
+            !selectedjavito ||
             !mapRef.current
         )
             return;
 
         console.log(
             "ZOOMING TO:",
-            selectedPartner.name
+            selectedjavito.name
         );
 
         mapRef.current.animateToRegion(
             {
                 latitude:
-                    selectedPartner.latitude,
+                    selectedjavito.latitude,
 
                 longitude:
-                    selectedPartner.longitude,
+                    selectedjavito.longitude,
 
                 latitudeDelta:
                     0.02,
@@ -87,7 +87,7 @@ export default function WebMap({
             900
         );
     }, [
-        selectedPartner,
+        selectedjavito,
     ]);
 
     return (
@@ -106,26 +106,26 @@ export default function WebMap({
                 }
                 showsUserLocation
             >
-                {partners.map(
+                {javitos.map(
                     (
-                        partner
+                        javito
                     ) => (
                         <Marker
                             key={
-                                partner.id
+                                javito.id
                             }
                             coordinate={{
                                 latitude:
-                                    partner.latitude,
+                                    javito.latitude,
 
                                 longitude:
-                                    partner.longitude,
+                                    javito.longitude,
                             }}
                             title={
-                                partner.name
+                                javito.name
                             }
                             description={
-                                partner.address
+                                javito.address
                             }
                         />
                     )

@@ -6,7 +6,7 @@ import {
     supabase,
 } from "../lib/supabase";
 
-export type Partner = {
+export type javito = {
     id: string;
 
     name: string;
@@ -22,24 +22,24 @@ export type Partner = {
     longitude: number;
 };
 
-type PartnerState = {
-    partners: Partner[];
+type javitoState = {
+    javitos: javito[];
 
     loading: boolean;
 
-    fetchPartners:
+    fetchJavitos:
     () => Promise<void>;
 };
 
 export const
-    usePartnersStore =
-        create<PartnerState>()(
+    useJavitosStore =
+        create<javitoState>()(
             (set) => ({
-                partners: [],
+                javitos: [],
 
                 loading: false,
 
-                fetchPartners:
+                fetchJavitos:
                     async () => {
                         set({
                             loading:
@@ -52,7 +52,7 @@ export const
                         } =
                             await supabase
                                 .from(
-                                    "partners"
+                                    "javitos"
                                 )
                                 .select(
                                     "*"
@@ -66,12 +66,12 @@ export const
                                 );
 
                         console.log(
-                            "PARTNERS:",
+                            "javitos:",
                             data
                         );
 
                         console.log(
-                            "PARTNERS ERROR:",
+                            "javitos ERROR:",
                             error
                         );
 
@@ -91,7 +91,7 @@ export const
                         }
 
                         set({
-                            partners:
+                            javitos:
                                 data ??
                                 [],
 

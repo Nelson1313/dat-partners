@@ -15,8 +15,8 @@ import {
 } from "lucide-react";
 
 import {
-    usePartnersStore,
-} from "../../store/partnersStore";
+    useJavitosStore,
+} from "../../store/javitosStore";
 
 
 import {
@@ -26,7 +26,7 @@ import {
 } from "react";
 
 import {
-    setSelectedPartner,
+    setSelectedjavito,
 } from "../../store/mapStore";
 
 export default function ListScreen() {
@@ -34,25 +34,25 @@ export default function ListScreen() {
         useState("");
 
     const {
-        partners,
-        fetchPartners,
+        javitos,
+        fetchJavitos,
     } =
-        usePartnersStore();
+        useJavitosStore();
 
     useFocusEffect(
         useCallback(() => {
             const load =
                 async () => {
-                    await fetchPartners();
+                    await fetchJavitos();
                 };
 
             load();
         }, [])
     );
 
-    const filteredPartners =
+    const filteredjavitos =
         useMemo(() => {
-            return [...partners]
+            return [...javitos]
                 .sort((a, b) => {
                     const zipA =
                         parseInt(
@@ -73,17 +73,17 @@ export default function ListScreen() {
                     );
                 })
                 .filter(
-                    (partner) => {
+                    (javito) => {
                         const query =
                             search.toLowerCase();
 
                         return (
-                            partner.name
+                            javito.name
                                 .toLowerCase()
                                 .includes(
                                     query
                                 ) ||
-                            partner.address
+                            javito.address
                                 .toLowerCase()
                                 .includes(
                                     query
@@ -93,7 +93,7 @@ export default function ListScreen() {
                 );
         }, [
             search,
-            partners,
+            javitos,
         ]);
 
     return (
@@ -130,7 +130,7 @@ export default function ListScreen() {
                                 styles.activeTabText
                             }
                         >
-                            Partnerek
+                            javitoek
                         </Text>
                     </View>
                 </View>
@@ -149,7 +149,7 @@ export default function ListScreen() {
                             styles.title
                         }
                     >
-                        Partnerek
+                        javitoek
                     </Text>
 
                     <Text
@@ -158,9 +158,9 @@ export default function ListScreen() {
                         }
                     >
                         {
-                            filteredPartners.length
+                            filteredjavitos.length
                         }{" "}
-                        partner
+                        javito
                     </Text>
                 </View>
 
@@ -180,7 +180,7 @@ export default function ListScreen() {
                 {/* list */}
                 <FlatList
                     data={
-                        filteredPartners
+                        filteredjavitos
                     }
                     keyExtractor={(
                         item
@@ -206,13 +206,13 @@ export default function ListScreen() {
                                 0.9
                             }
                             onPress={() => {
-                                setSelectedPartner(
+                                setSelectedjavito(
                                     item.id
                                 );
 
                                 router.push({
                                     pathname:
-                                        "/partner/[id]",
+                                        "/javito/[id]",
 
                                     params: {
                                         id: item.id,
@@ -233,7 +233,7 @@ export default function ListScreen() {
                             >
                                 <Text
                                     style={
-                                        styles.partnerName
+                                        styles.javitoName
                                     }
                                 >
                                     {
@@ -244,7 +244,7 @@ export default function ListScreen() {
                                 <View style={styles.infoRow}>
                                     <MapPin
                                         size={16}
-                                        color="#009DDF"
+                                        color="#003B7A"
                                         strokeWidth={2.4}
                                     />
 
@@ -316,7 +316,7 @@ const styles =
 
         activeTab: {
             backgroundColor:
-                "#009DDF",
+                "#003B7A",
             borderRadius: 12,
             paddingHorizontal: 16,
             paddingVertical: 8,
@@ -355,7 +355,7 @@ const styles =
         title: {
             fontSize: 28,
             fontWeight: "800",
-            color: "#0F172A",
+            color: "#003B7A",
         },
 
         count: {
@@ -393,7 +393,7 @@ const styles =
             height: 12,
             borderRadius: 999,
             backgroundColor:
-                "#009DDF",
+                "#003B7A",
             marginTop: 6,
             marginRight: 14,
         },
@@ -402,10 +402,10 @@ const styles =
             flex: 1,
         },
 
-        partnerName: {
+        javitoName: {
             fontSize: 18,
             fontWeight: "700",
-            color: "#0F172A",
+            color: "#003B7A",
             marginBottom: 8,
         },
 

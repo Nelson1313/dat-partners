@@ -125,7 +125,7 @@ export default function Login() {
                 >
                     <Image
                         source={require(
-                            "../../assets/aviloo-dat-logo.png"
+                            "../../assets/dat-logo.jpg"
                         )}
                         style={
                             styles.logoImage
@@ -247,7 +247,7 @@ const styles =
 
         button: {
             backgroundColor:
-                "#009DDF",
+                "#003B7A",
 
             height: 58,
 

@@ -13,7 +13,7 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 
 import {
-  canEditPartners,
+  canEditjavitos,
 } from "../../utils/permissions";
 
 import { useAuthStore } from "../../store/authStore";
@@ -35,7 +35,7 @@ import {
 } from "lucide-react";
 
 import WebMap from "@/components/map/WebMap";
-import { usePartnersStore } from "../../store/partnersStore";
+import { useJavitosStore } from "../../store/javitosStore";
 
 let WebMapLeaflet:
   any = null;
@@ -54,30 +54,30 @@ if (
 
 export default function MapScreen() {
 
-  const closePartnerModal =
+  const closejavitoModal =
     () => {
-      setShowPartnerModal(
+      setShowjavitoModal(
         false
       );
 
       setTimeout(() => {
-        setEditingPartner(
+        setEditingjavito(
           null
         );
 
-        setPartnerName(
+        setjavitoName(
           ""
         );
 
-        setPartnerAddress(
+        setjavitoAddress(
           ""
         );
 
-        setPartnerPhone(
+        setjavitoPhone(
           ""
         );
 
-        setPartnerEmail(
+        setjavitoEmail(
           ""
         );
       }, 250);
@@ -85,8 +85,8 @@ export default function MapScreen() {
 
 
   const [
-    selectedPartner,
-    setSelectedPartner,
+    selectedjavito,
+    setSelectedjavito,
   ] = useState<any>(
     null
   );
@@ -97,35 +97,35 @@ export default function MapScreen() {
   ] = useState(false);
 
   const [
-    editingPartner,
-    setEditingPartner,
+    editingjavito,
+    setEditingjavito,
   ] = useState<any>(
     null
   );
 
   const [
-    showPartnerModal,
-    setShowPartnerModal,
+    showjavitoModal,
+    setShowjavitoModal,
   ] = useState(false);
 
   const [
-    partnerName,
-    setPartnerName,
+    javitoName,
+    setjavitoName,
   ] = useState("");
 
   const [
-    partnerAddress,
-    setPartnerAddress,
+    javitoAddress,
+    setjavitoAddress,
   ] = useState("");
 
   const [
-    partnerPhone,
-    setPartnerPhone,
+    javitoPhone,
+    setjavitoPhone,
   ] = useState("");
 
   const [
-    partnerEmail,
-    setPartnerEmail,
+    javitoEmail,
+    setjavitoEmail,
   ] = useState("");
 
   const {
@@ -137,75 +137,75 @@ export default function MapScreen() {
     useAuthStore();
 
   const {
-    partners,
-    fetchPartners,
+    javitos,
+    fetchJavitos,
   } =
-    usePartnersStore();
+    useJavitosStore();
 
   useEffect(() => {
     checkSession();
-    fetchPartners();
+    fetchJavitos();
   }, []);
 
   const emailValid =
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-      partnerEmail
+      javitoEmail
     );
 
   const phoneValid =
     /^(\+36|06)?[\s-]?(20|30|31|50|70)[\s-]?\d{3}[\s-]?\d{4}$/.test(
-      partnerPhone.replace(
+      javitoPhone.replace(
         /\s/g,
         ""
       )
     );
 
-  const canSavePartner =
-    partnerName.trim() !==
+  const canSavejavito =
+    javitoName.trim() !==
     "" &&
-    partnerAddress.trim() !==
+    javitoAddress.trim() !==
     "" &&
     phoneValid &&
     emailValid;
 
-  const handleSavePartner =
+  const handleSavejavito =
     async () => {
       try {
         const endpoint =
-          editingPartner
-            ? "update-partner"
-            : "geocode-partner";
+          editingjavito
+            ? "update-javito"
+            : "geocode-javito";
 
         const body =
-          editingPartner
+          editingjavito
             ? {
               id:
-                editingPartner.id,
+                editingjavito.id,
 
               name:
-                partnerName,
+                javitoName,
 
               address:
-                partnerAddress,
+                javitoAddress,
 
               phone:
-                partnerPhone,
+                javitoPhone,
 
               email:
-                partnerEmail,
+                javitoEmail,
             }
             : {
               name:
-                partnerName,
+                javitoName,
 
               address:
-                partnerAddress,
+                javitoAddress,
 
               phone:
-                partnerPhone,
+                javitoPhone,
 
               email:
-                partnerEmail,
+                javitoEmail,
             };
 
         const response =
@@ -241,25 +241,25 @@ export default function MapScreen() {
         }
 
         // reset
-        setPartnerName(
+        setjavitoName(
           ""
         );
 
-        setPartnerAddress(
+        setjavitoAddress(
           ""
         );
 
-        setPartnerPhone(
+        setjavitoPhone(
           ""
         );
 
-        setPartnerEmail(
+        setjavitoEmail(
           ""
         );
 
-        closePartnerModal();
+        closejavitoModal();
 
-        await fetchPartners();
+        await fetchJavitos();
       } catch (
       error
       ) {
@@ -269,21 +269,21 @@ export default function MapScreen() {
         );
 
         alert(
-          "Nem sikerült menteni a partnert."
+          "Nem sikerült menteni a javitot."
         );
       }
     };
 
-  const handleDeletePartner =
+  const handleDeletejavito =
     async () => {
       if (
-        !editingPartner
+        !editingjavito
       )
         return;
 
       const confirmed =
         confirm(
-          "Biztos törölni szeretnéd ezt a partnert?"
+          "Biztos törölni szeretnéd ezt a javitot?"
         );
 
       if (
@@ -294,7 +294,7 @@ export default function MapScreen() {
       try {
         const response =
           await fetch(
-            "https://nebgtkogsnvlvoveiaxv.supabase.co/functions/v1/delete-partner",
+            "https://nebgtkogsnvlvoveiaxv.supabase.co/functions/v1/delete-javito",
             {
               method:
                 "POST",
@@ -308,7 +308,7 @@ export default function MapScreen() {
               body:
                 JSON.stringify({
                   id:
-                    editingPartner.id,
+                    editingjavito.id,
                 }),
             }
           );
@@ -324,13 +324,13 @@ export default function MapScreen() {
           );
         }
 
-        closePartnerModal();
+        closejavitoModal();
 
-        setSelectedPartner(
+        setSelectedjavito(
           null
         );
 
-        await fetchPartners();
+        await fetchJavitos();
       } catch (
       error
       ) {
@@ -357,7 +357,7 @@ export default function MapScreen() {
           >
             <Image
               source={require(
-                "../../../assets/aviloo-dat-logo.png"
+                "../../../assets/dat-logo.jpg"
               )}
               style={styles.logo}
               resizeMode="contain"
@@ -370,17 +370,17 @@ export default function MapScreen() {
             styles.brandSubtitle
           }
         >
-          {partners.length} partner
+          {javitos.length} javito
         </Text>
 
         {/* header */}
         <View style={styles.listHeader}>
           <Text style={styles.listTitle}>
-            Partnerek
+            javitoek
           </Text>
         </View>
 
-        {/* partner list */}
+        {/* javito list */}
         <ScrollView
           showsVerticalScrollIndicator={
             false
@@ -389,7 +389,7 @@ export default function MapScreen() {
             paddingBottom: 20,
           }}
         >
-          {[...partners]
+          {[...javitos]
             .sort((a, b) => {
               const zipA = parseInt(
                 a.address.match(/^\d+/)?.[0] || "0"
@@ -402,16 +402,16 @@ export default function MapScreen() {
               return zipA - zipB;
             })
             .map((
-              partner,
+              javito,
               index
             ) => (
               <TouchableOpacity
-                key={partner.id}
+                key={javito.id}
                 style={[
-                  styles.partnerRow,
+                  styles.javitoRow,
                   index % 2 === 0
-                    ? styles.partnerRowLight
-                    : styles.partnerRowDark,
+                    ? styles.javitoRowLight
+                    : styles.javitoRowDark,
                 ]}
                 activeOpacity={
                   0.85
@@ -419,78 +419,78 @@ export default function MapScreen() {
                 onPress={() => {
                   console.log(
                     "CLICKED:",
-                    partner.id
+                    javito.id
                   );
 
 
 
-                  setSelectedPartner(
-                    partner
+                  setSelectedjavito(
+                    javito
                   );
                 }}
 
                 onLongPress={() => {
                   if (
-                    !canEditPartners(
+                    !canEditjavitos(
                       role
                     )
                   )
                     return;
 
-                  setEditingPartner(
-                    partner
+                  setEditingjavito(
+                    javito
                   );
 
-                  setPartnerName(
-                    partner.name
+                  setjavitoName(
+                    javito.name
                   );
 
-                  setPartnerAddress(
-                    partner.address
+                  setjavitoAddress(
+                    javito.address
                   );
 
-                  setPartnerPhone(
-                    partner.phone ||
+                  setjavitoPhone(
+                    javito.phone ||
                     ""
                   );
 
-                  setPartnerEmail(
-                    partner.email ||
+                  setjavitoEmail(
+                    javito.email ||
                     ""
                   );
 
-                  setShowPartnerModal(
+                  setShowjavitoModal(
                     true
                   );
                 }}
               >
                 <View
                   style={
-                    styles.partnerDot
+                    styles.javitoDot
                   }
                 />
 
                 <View
                   style={
-                    styles.partnerInfo
+                    styles.javitoInfo
                   }
                 >
                   <Text
                     style={
-                      styles.partnerName
+                      styles.javitoName
                     }
                     numberOfLines={1}
                   >
-                    {partner.name}
+                    {javito.name}
                   </Text>
 
                   <Text
                     style={
-                      styles.partnerCity
+                      styles.javitoCity
                     }
                     numberOfLines={1}
                   >
-                    {partner.address}
+                    {javito.address}
                   </Text>
                 </View>
 
@@ -536,7 +536,7 @@ export default function MapScreen() {
               <Text
                 style={styles.tabText}
               >
-                Partnerek
+                javitoek
               </Text>
             </TouchableOpacity>
           </View>
@@ -628,7 +628,7 @@ export default function MapScreen() {
                       </View>
                     </TouchableOpacity>
 
-                    {canEditPartners(
+                    {canEditjavitos(
                       role
                     ) && (
                         <TouchableOpacity
@@ -639,28 +639,28 @@ export default function MapScreen() {
                             );
 
                             // reset edit mode
-                            setEditingPartner(
+                            setEditingjavito(
                               null
                             );
 
                             // reset form
-                            setPartnerName(
+                            setjavitoName(
                               ""
                             );
 
-                            setPartnerAddress(
+                            setjavitoAddress(
                               ""
                             );
 
-                            setPartnerPhone(
+                            setjavitoPhone(
                               ""
                             );
 
-                            setPartnerEmail(
+                            setjavitoEmail(
                               ""
                             );
 
-                            setShowPartnerModal(
+                            setShowjavitoModal(
                               true
                             );
                           }}
@@ -678,7 +678,7 @@ export default function MapScreen() {
                               style={styles.menuText}
                               numberOfLines={1}
                             >
-                              Partner hozzáadása
+                              javito hozzáadása
                             </Text>
                           </View>
                         </TouchableOpacity>
@@ -719,24 +719,24 @@ export default function MapScreen() {
             "web" &&
             WebMapLeaflet ? (
             <WebMapLeaflet
-              partners={
-                partners
+              javitos={
+                javitos
               }
-              selectedPartner={
-                selectedPartner
+              selectedjavito={
+                selectedjavito
               }
             />
           ) : (
             <WebMap
-              selectedPartner={
-                selectedPartner
+              selectedjavito={
+                selectedjavito
               }
             />
           )}
         </View>
       </View >
       <Modal
-        visible={showPartnerModal}
+        visible={showjavitoModal}
         transparent
         animationType="fade"
       >
@@ -763,7 +763,7 @@ export default function MapScreen() {
               >
                 <PlusCircle
                   size={28}
-                  color="#009DDF"
+                  color="#003B7A"
                 />
               </View>
 
@@ -777,9 +777,9 @@ export default function MapScreen() {
                     styles.modalTitle
                   }
                 >
-                  {editingPartner
-                    ? "Partner szerkesztése"
-                    : "Új partner"}
+                  {editingjavito
+                    ? "javito szerkesztése"
+                    : "Új javito"}
                 </Text>
 
                 <Text
@@ -787,15 +787,15 @@ export default function MapScreen() {
                     styles.modalSubtitle
                   }
                 >
-                  {editingPartner
-                    ? "Partner adatok módosítása"
-                    : "Partner hozzáadása automatikus geokódolással"}
+                  {editingjavito
+                    ? "javito adatok módosítása"
+                    : "javito hozzáadása automatikus geokódolással"}
                 </Text>
               </View>
 
               <TouchableOpacity
                 onPress={
-                  closePartnerModal
+                  closejavitoModal
                 }
                 style={
                   styles.closeButton
@@ -816,18 +816,18 @@ export default function MapScreen() {
             >
               <Building2
                 size={18}
-                color="#009DDF"
+                color="#003B7A"
               />
 
               <TextInput
-                placeholder="Partner neve"
+                placeholder="javito neve"
                 placeholderTextColor="#94A3B8"
                 style={
                   styles.input
                 }
-                value={partnerName}
+                value={javitoName}
                 onChangeText={
-                  setPartnerName
+                  setjavitoName
                 }
               />
             </View>
@@ -840,7 +840,7 @@ export default function MapScreen() {
             >
               <MapPin
                 size={18}
-                color="#009DDF"
+                color="#003B7A"
               />
 
               <TextInput
@@ -850,10 +850,10 @@ export default function MapScreen() {
                   styles.input
                 }
                 value={
-                  partnerAddress
+                  javitoAddress
                 }
                 onChangeText={
-                  setPartnerAddress
+                  setjavitoAddress
                 }
               />
             </View>
@@ -876,10 +876,10 @@ export default function MapScreen() {
                   styles.input
                 }
                 value={
-                  partnerPhone
+                  javitoPhone
                 }
                 onChangeText={
-                  setPartnerPhone
+                  setjavitoPhone
                 }
               />
             </View>
@@ -902,14 +902,14 @@ export default function MapScreen() {
                   styles.input
                 }
                 value={
-                  partnerEmail
+                  javitoEmail
                 }
                 onChangeText={
-                  setPartnerEmail
+                  setjavitoEmail
                 }
               />
 
-              {partnerEmail !==
+              {javitoEmail !==
                 "" &&
                 !emailValid && (
                   <Text
@@ -921,7 +921,7 @@ export default function MapScreen() {
                   </Text>
                 )}
             </View>
-            {!canSavePartner && (
+            {!canSavejavito && (
               <Text
                 style={{
                   color: "#94A3B8",
@@ -934,13 +934,13 @@ export default function MapScreen() {
               </Text>
             )}
 
-            {editingPartner && (
+            {editingjavito && (
               <TouchableOpacity
                 style={
                   styles.deleteButton
                 }
                 onPress={
-                  handleDeletePartner
+                  handleDeletejavito
                 }
               >
                 <Text
@@ -948,7 +948,7 @@ export default function MapScreen() {
                     styles.deleteText
                   }
                 >
-                  🗑 Partner törlése
+                  🗑 javito törlése
                 </Text>
               </TouchableOpacity>
             )}
@@ -964,7 +964,7 @@ export default function MapScreen() {
                   styles.cancelButton
                 }
                 onPress={
-                  closePartnerModal
+                  closejavitoModal
                 }
               >
                 <Text
@@ -979,14 +979,14 @@ export default function MapScreen() {
               <TouchableOpacity
                 style={[
                   styles.saveButton,
-                  !canSavePartner &&
+                  !canSavejavito &&
                   styles.saveButtonDisabled,
                 ]}
                 disabled={
-                  !canSavePartner
+                  !canSavejavito
                 }
                 onPress={
-                  handleSavePartner
+                  handleSavejavito
                 }
               >
                 <Text
@@ -994,9 +994,9 @@ export default function MapScreen() {
                     styles.saveText
                   }
                 >
-                  {editingPartner
+                  {editingjavito
                     ? "Módosítás mentése"
-                    : "Partner mentése"}
+                    : "javito mentése"}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -1039,7 +1039,7 @@ const styles =
       height: 12,
       borderRadius: 999,
       backgroundColor:
-        "#009DDF",
+        "#003B7A",
       marginRight: 12,
     },
 
@@ -1068,7 +1068,7 @@ const styles =
       letterSpacing: 1,
     },
 
-    partnerRow: {
+    javitoRow: {
       flexDirection: "row",
       alignItems: "center",
       paddingVertical: 16,
@@ -1084,7 +1084,7 @@ const styles =
         "#E8EEF5",
 
       shadowColor:
-        "#0F172A",
+        "#003B7A",
       shadowOpacity:
         0.04,
       shadowRadius: 12,
@@ -1096,26 +1096,26 @@ const styles =
       elevation: 2,
     },
 
-    partnerDot: {
+    javitoDot: {
       width: 10,
       height: 10,
       borderRadius: 999,
       backgroundColor:
-        "#009DDF",
+        "#003B7A",
       marginRight: 14,
     },
 
-    partnerInfo: {
+    javitoInfo: {
       flex: 1,
     },
 
-    partnerName: {
+    javitoName: {
       fontSize: 15,
       fontWeight: "600",
       color: "#111827",
     },
 
-    partnerCity: {
+    javitoCity: {
       color: "#64748B",
       marginTop: 2,
       fontSize: 13,
@@ -1159,7 +1159,7 @@ const styles =
 
     activeTab: {
       backgroundColor:
-        "#009DDF",
+        "#003B7A",
       borderRadius: 12,
       paddingHorizontal: 16,
       paddingVertical: 8,
@@ -1210,14 +1210,14 @@ const styles =
       zIndex: 1,
     },
 
-    partnerRowLight: {
+    javitoRowLight: {
       backgroundColor:
         "#FFFFFF",
     },
 
-    partnerRowDark: {
+    javitoRowDark: {
       backgroundColor:
-        "#F8FBFE",
+        "#FFFDF3",
       borderColor:
         "#DCE8F5",
     },
@@ -1260,7 +1260,7 @@ const styles =
 
     profileButton: {
       backgroundColor:
-        "#0F172A",
+        "#003B7A",
 
       height: 42,
 
@@ -1383,7 +1383,7 @@ const styles =
         "#EEF2F7",
 
       shadowColor:
-        "#0F172A",
+        "#003B7A",
 
       shadowOpacity:
         0.14,
@@ -1400,7 +1400,7 @@ const styles =
     modalTitle: {
       fontSize: 26,
       fontWeight: "800",
-      color: "#0F172A",
+      color: "#003B7A",
     },
 
     input: {
@@ -1408,7 +1408,7 @@ const styles =
       height: "100%",
       marginLeft: 14,
       fontSize: 15,
-      color: "#0F172A",
+      color: "#003B7A",
     },
 
     saveButton: {
@@ -1419,7 +1419,7 @@ const styles =
       borderRadius: 18,
 
       backgroundColor:
-        "#009DDF",
+        "#003B7A",
 
       justifyContent:
         "center",
@@ -1428,7 +1428,7 @@ const styles =
         "center",
 
       shadowColor:
-        "#009DDF",
+        "#003B7A",
 
       shadowOpacity:
         0.28,
@@ -1548,7 +1548,7 @@ const styles =
       borderRadius: 22,
 
       backgroundColor:
-        "#E0F2FE",
+        "#FFF8CC",
 
       justifyContent:
         "center",
@@ -1616,5 +1616,19 @@ const styles =
       fontWeight: "700",
 
       fontSize: 15,
+    },
+
+    validationError: {
+      color: "#DC2626",
+
+      fontSize: 12,
+
+      fontWeight: "600",
+
+      marginTop: -8,
+
+      marginBottom: 12,
+
+      marginLeft: 4,
     },
   });

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
 type Props = {
-    selectedPartnerId?: string | null;
+    selectedjavitoId?: string | null;
 };
 
 export default function WebMap({
-    selectedPartnerId,
+    selectedjavitoId,
 }: Props) {
     const [MapComponent, setMapComponent] =
         useState<any>(null);
@@ -30,8 +30,8 @@ export default function WebMap({
 
     return (
         <MapComponent
-            selectedPartnerId={
-                selectedPartnerId
+            selectedjavitoId={
+                selectedjavitoId
             }
         />
     );

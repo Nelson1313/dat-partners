@@ -39,7 +39,7 @@ async function geocodeAddress(address) {
             {
                 headers: {
                     "User-Agent":
-                        "AVILOO-Partner-Locator/1.0",
+                        "AVILOO-javito-Locator/1.0",
                 },
                 timeout: 10000,
             }
@@ -92,7 +92,7 @@ async function run() {
     const rows =
         XLSX.utils.sheet_to_json(sheet);
 
-    const partners = [];
+    const javitos = [];
 
     for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
@@ -128,7 +128,7 @@ async function run() {
                 geoAddress || address
             );
 
-        partners.push({
+        javitos.push({
             id: String(i + 1),
             name,
             address,
@@ -146,20 +146,20 @@ async function run() {
     }
 
     const output = `
-export const partners = ${JSON.stringify(
-        partners,
+export const javitos = ${JSON.stringify(
+        javitos,
         null,
         2
     )};
 `;
 
     fs.writeFileSync(
-        "./data/partners.ts",
+        "./data/javitos.ts",
         output
     );
 
     console.log(
-        "partners.ts sikeresen generálva!"
+        "javitos.ts sikeresen generálva!"
     );
 }
 

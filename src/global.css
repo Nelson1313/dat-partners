@@ -60,7 +60,7 @@ body,
       255,
       .95) !important;
 
-  color: #0f172a !important;
+  color: #003B7A !important;
   font-size: 24px !important;
 
   transition:
@@ -139,7 +139,7 @@ body,
 .popup-title {
   font-size: 16px;
   font-weight: 800;
-  color: #0f172a;
+  color: #003B7A;
   margin-bottom: 10px;
   line-height: 1.2;
 }
@@ -248,7 +248,7 @@ body,
 }
 
 .popup-action span {
-  color: #0f172a;
+  color: #003B7A;
   font-size: 13px;
   font-weight: 700;
 }

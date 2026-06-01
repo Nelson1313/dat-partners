@@ -1,33 +1,33 @@
 
-[functions.geocode-partner]
+[functions.geocode-javito]
 enabled = true
 verify_jwt = false
-import_map = "./functions/geocode-partner/deno.json"
+import_map = "./functions/geocode-javito/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/geocode-partner/index.ts"
+entrypoint = "./functions/geocode-javito/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/geocode-partner/*.html" ]
+# static_files = [ "./functions/geocode-javito/*.html" ]
 
-[functions.update-partner]
+[functions.update-javito]
 enabled = true
 verify_jwt = false
-import_map = "./functions/update-partner/deno.json"
+import_map = "./functions/update-javito/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/update-partner/index.ts"
+entrypoint = "./functions/update-javito/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/update-partner/*.html" ]
+# static_files = [ "./functions/update-javito/*.html" ]
 
-[functions.delete-partner]
+[functions.delete-javito]
 enabled = true
 verify_jwt = false
-import_map = "./functions/delete-partner/deno.json"
+import_map = "./functions/delete-javito/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/delete-partner/index.ts"
+entrypoint = "./functions/delete-javito/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/delete-partner/*.html" ]
+# static_files = [ "./functions/delete-javito/*.html" ]
