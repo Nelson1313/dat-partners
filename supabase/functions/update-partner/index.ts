@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std/http/server.ts";
 
 import {
-    createClient,
+  createClient,
 } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -12,6 +12,9 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+console.log(
+  "VERSION 2 UPDATE"
+);
 serve(async (req) => {
   // CORS preflight
   if (
@@ -34,13 +37,18 @@ serve(async (req) => {
       address,
       phone,
       email,
+      partner_type,
     } =
       await req.json();
 
     const supabase =
       createClient(
-        Deno.env.get(
-          "SUPABASE_URL"
+        console.log(
+  "SUPABASE URL:",
+  Deno.env.get(
+    "SUPABASE_URL"
+  )
+);
         )!,
         Deno.env.get(
           "SUPABASE_SERVICE_ROLE_KEY"
@@ -48,28 +56,68 @@ serve(async (req) => {
       );
 
     const {
-      error,
-    } =
-      await supabase
-        .from(
-          "javitos"
-        )
-        .update({
-          name,
-          address,
-          phone,
-          email,
-        })
-        .eq(
-          "id",
-          id
-        );
+  data,
+  error,
+} =
+  await supabase
+    .from(
+      "partners"
+    )
+    .update({
+  identifier,
 
-    if (
-      error
-    ) {
-      throw error;
-    }
+  name,
+
+  address,
+
+  phone,
+
+  email,
+
+  partner_type,
+
+  tax_number,
+
+  customer_id,
+
+  contact,
+
+  postal_code,
+
+  city,
+
+  street,
+})
+    .eq(
+      "id",
+      id
+    )
+    .select();
+
+console.log(
+  "UPDATED DATA:",
+  data
+);
+
+console.log(
+  "UPDATE ERROR:",
+  error
+);
+
+if (
+  error
+) {
+  throw error;
+}
+
+if (
+  !data ||
+  data.length === 0
+) {
+  throw new Error(
+    "No rows updated"
+  );
+}
 
     return new Response(
       JSON.stringify({

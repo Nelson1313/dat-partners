@@ -13,12 +13,13 @@ import {
     View,
 } from "react-native";
 
+
 import {
-    useJavitosStore,
-} from "../../store/javitosStore";
+    usePartnersStore,
+} from "../../store/partnersStore";
 
 type Props = {
-    selectedjavito?:
+    selectedPartner?:
     | {
         id: string;
         name: string;
@@ -27,20 +28,21 @@ type Props = {
         email: string;
         latitude: number;
         longitude: number;
+        partner_type?: string;
     }
     | null;
 };
 
 export default function WebMap({
-    selectedjavito,
+    selectedPartner,
 }: Props) {
     const mapRef =
         useRef<MapView>(null);
 
     const {
-        javitos,
+        partners,
     } =
-        useJavitosStore();
+        usePartnersStore();
 
     const initialRegion: Region =
     {
@@ -60,23 +62,23 @@ export default function WebMap({
     // sidebar click → zoom
     useEffect(() => {
         if (
-            !selectedjavito ||
+            !selectedPartner ||
             !mapRef.current
         )
             return;
 
         console.log(
             "ZOOMING TO:",
-            selectedjavito.name
+            selectedPartner.name
         );
 
         mapRef.current.animateToRegion(
             {
                 latitude:
-                    selectedjavito.latitude,
+                    selectedPartner.latitude,
 
                 longitude:
-                    selectedjavito.longitude,
+                    selectedPartner.longitude,
 
                 latitudeDelta:
                     0.02,
@@ -87,7 +89,7 @@ export default function WebMap({
             900
         );
     }, [
-        selectedjavito,
+        selectedPartner,
     ]);
 
     return (
@@ -106,28 +108,47 @@ export default function WebMap({
                 }
                 showsUserLocation
             >
-                {javitos.map(
+                {partners.map(
                     (
-                        javito
+                        partner
                     ) => (
                         <Marker
                             key={
-                                javito.id
+                                partner.id
                             }
                             coordinate={{
                                 latitude:
-                                    javito.latitude,
+                                    partner.latitude,
 
                                 longitude:
-                                    javito.longitude,
+                                    partner.longitude,
                             }}
                             title={
-                                javito.name
+                                partner.name
                             }
                             description={
-                                javito.address
+                                partner.address
                             }
-                        />
+                        >
+                            <View
+                                style={[
+                                    styles.marker,
+                                    partner.partner_type ===
+                                        "Független"
+                                        ? styles.markerIndependent
+                                        : partner.partner_type ===
+                                            "Márkaszervíz"
+                                            ? styles.markerBrand
+                                            : styles.markerEvaluator,
+                                ]}
+                            >
+                                <View
+                                    style={
+                                        styles.markerInner
+                                    }
+                                />
+                            </View>
+                        </Marker>
                     )
                 )}
             </MapView>
@@ -143,5 +164,64 @@ const styles =
 
         map: {
             flex: 1,
+        },
+
+        marker: {
+            width: 28,
+            height: 28,
+
+            borderRadius: 999,
+
+            borderWidth: 4,
+
+            borderColor:
+                "#09142B",
+
+            justifyContent:
+                "center",
+
+            alignItems:
+                "center",
+
+            shadowColor:
+                "#000",
+
+            shadowOpacity:
+                0.28,
+
+            shadowRadius:
+                12,
+
+            shadowOffset: {
+                width: 0,
+                height: 5,
+            },
+
+            elevation: 8,
+        },
+
+        markerInner: {
+            width: 8,
+            height: 8,
+
+            borderRadius: 999,
+
+            backgroundColor:
+                "#FFFFFF",
+        },
+
+        markerIndependent: {
+            backgroundColor:
+                "#63D471",
+        },
+
+        markerBrand: {
+            backgroundColor:
+                "#FFD400",
+        },
+
+        markerEvaluator: {
+            backgroundColor:
+                "#FF5C8A",
         },
     });

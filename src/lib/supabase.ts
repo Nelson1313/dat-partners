@@ -9,10 +9,10 @@ import {
 } from "react-native";
 
 const supabaseUrl =
-    "https://nebgtkogsnvlvoveiaxv.supabase.co";
+    "https://nseopolqejpjftjutckn.supabase.co";
 
 const supabaseAnonKey =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lYmd0a29nc252bHZvdmVpYXh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4ODU3MDYsImV4cCI6MjA5NTQ2MTcwNn0.krLCwlV9M-50RS7NrC001WosHegRXAA_Uc010M4jYPs";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zZW9wb2xxZWpwamZ0anV0Y2tuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyOTYwMzUsImV4cCI6MjA5NTg3MjAzNX0.Zz6yR3WEnXQwneTkJEqcX0nHYC-_Xz4V7_W9sGwHAic";
 
 export const supabase =
     createClient(

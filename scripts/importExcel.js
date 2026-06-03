@@ -1,166 +1,451 @@
 const XLSX = require("xlsx");
-const fs = require("fs");
 const axios = require("axios");
+const path = require("path");
+
+const { createClient } = require("@supabase/supabase-js");
+
+const supabase = createClient(
+    "https://nseopolqejpjftjutckn.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zZW9wb2xxZWpwamZ0anV0Y2tuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDI5NjAzNSwiZXhwIjoyMDk1ODcyMDM1fQ.6ZjRaBSpZd4iaS0X9j_Wa5NqstLEIIRmRPyeh_IS7WA"
+);
+
+function delay(ms) {
+    return new Promise((resolve) =>
+        setTimeout(resolve, ms)
+    );
+}
+
+async function search(query) {
+    const response = await axios.get(
+        "https://nominatim.openstreetmap.org/search",
+        {
+            params: {
+                q: query,
+                format: "json",
+                limit: 1,
+                countrycodes: "hu",
+            },
+            headers: {
+                "User-Agent":
+                    "DAT-partners/1.0",
+            },
+            timeout: 10000,
+        }
+    );
+
+    await delay(1200);
+
+    return response.data;
+}
 
 async function geocodeAddress(address) {
     try {
-        const cleanedAddress = String(address)
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/\./g, "")
-            .replace(/\bu\b/g, "utca")
-            .replace(/\but\b/g, "ut")
-            .replace(/\bter\b/g, "ter")
-            .replace(/\bep\b/g, "epulet")
+        const cleaned = String(
+            address
+        )
             .replace(/\s+/g, " ")
             .trim();
 
-        const match = cleanedAddress.match(
-            /^(\d{4})\s+([^,]+),\s*(.+)$/
-        );
+        // ==================
+        // TRY 1
+        // teljes cím
+        // ==================
 
-        let queryAddress = cleanedAddress;
-
-        if (match) {
-            const postalCode = match[1];
-            const city = match[2];
-            const street = match[3];
-
-            queryAddress = `${street}, ${city}, ${postalCode}, Hungary`;
-        }
-
-        console.log("QUERY:", queryAddress);
-
-        const query =
-            encodeURIComponent(queryAddress);
-
-        const response = await axios.get(
-            `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`,
-            {
-                headers: {
-                    "User-Agent":
-                        "AVILOO-javito-Locator/1.0",
-                },
-                timeout: 10000,
-            }
-        );
-
-        const data = response.data;
+        let data =
+            await search(cleaned);
 
         if (data.length > 0) {
-            console.log(
-                `✓ ${cleanedAddress}`
-            );
-
             return {
-                latitude: Number(data[0].lat),
-                longitude: Number(data[0].lon),
+                latitude: Number(
+                    data[0].lat
+                ),
+                longitude: Number(
+                    data[0].lon
+                ),
+                tryLevel: 1,
             };
         }
 
-        console.log(
-            `✗ Nincs találat: ${cleanedAddress}`
-        );
+        // ==================
+        // TRY 2
+        // házszám nélkül
+        // ==================
+
+        const noHouse =
+            cleaned.replace(
+                /\d+\/?\d*.*$/,
+                ""
+            );
+
+        data =
+            await search(noHouse);
+
+        if (data.length > 0) {
+            return {
+                latitude: Number(
+                    data[0].lat
+                ),
+                longitude: Number(
+                    data[0].lon
+                ),
+                tryLevel: 2,
+            };
+        }
+
+        // ==================
+        // TRY 3
+        // csak város
+        // ==================
+
+        const cityOnly =
+            cleaned.match(
+                /^(\d{4})\s+([^,]+)/
+            );
+
+        if (cityOnly) {
+            const query = `${cityOnly[1]} ${cityOnly[2]}`;
+
+            data =
+                await search(query);
+
+            if (
+                data.length > 0
+            ) {
+                return {
+                    latitude:
+                        Number(
+                            data[0]
+                                .lat
+                        ),
+                    longitude:
+                        Number(
+                            data[0]
+                                .lon
+                        ),
+                    tryLevel: 3,
+                };
+            }
+        }
 
         return {
             latitude: null,
             longitude: null,
+            tryLevel: 0,
         };
     } catch (error) {
         console.log(
-            `❌ Geocoding error: ${address}`
+            "GEOCODE ERROR:",
+            error.message
         );
 
         return {
             latitude: null,
             longitude: null,
+            tryLevel: 0,
         };
     }
 }
 
 async function run() {
-    const workbook = XLSX.readFile(
-        "./Aviloo_megrendelők.xlsx"
-    );
-
-    const sheetName =
-        workbook.SheetNames[0];
+    const workbook =
+        XLSX.readFile(
+            path.join(
+                __dirname,
+                "../javító partnerek lista_javítási kalk. és járműértékelő.xlsx"
+            )
+        );
 
     const sheet =
-        workbook.Sheets[sheetName];
+        workbook.Sheets[
+        workbook
+            .SheetNames[0]
+        ];
 
     const rows =
-        XLSX.utils.sheet_to_json(sheet);
+        XLSX.utils.sheet_to_json(
+            sheet
+        );
 
-    const javitos = [];
+    const failedGeocodes =
+        [];
 
-    for (let i = 0; i < rows.length; i++) {
-        const row = rows[i];
+    const secondTrySuccess =
+        [];
+
+    const thirdTrySuccess =
+        [];
+
+    for (
+        let i = 0;
+        i < rows.length;
+        i++
+    ) {
+        const row =
+            rows[i];
+
+        const identifier =
+            row[
+            "Azonosító"
+            ] || "";
 
         const name =
-            row["Megrendeő neve"] ||
-            row["Megrendelő neve"] ||
-            "";
+            row[
+            "Cégnév"
+            ] || "";
 
-        if (!name || String(name).trim() === "") {
+        if (!name) {
             continue;
         }
 
-        const address =
-            row["Címe"] || "";
+        const postal_code =
+            row[
+            "Irányítószám"
+            ] || "";
 
-        const geoAddress =
-            row["GeoCode_ADD"] || "";
+        const city =
+            row[
+            "Város"
+            ] || "";
+
+        const street =
+            row[
+            "Utca"
+            ] || "";
+
+        const county =
+            row["Megye"] || "";
+
+        const address =
+            `${postal_code} ${city}, ${street}`.trim();
+
+        const tax_number =
+            row[
+            "Adószám"
+            ] || "";
+
+        const contact =
+            row[
+            "Kapcsolat"
+            ] || "";
 
         const phone =
-            row["Telefonszám"] || "";
+            row["Tel"] || "";
 
         const email =
-            row["E-mail"] || "";
+            row["Mail"] || "";
+
+        const customer_id =
+            row[
+            "Ügyfélszám"
+            ] || "";
+
+        const partner_type =
+            row[
+            "Partner típusa"
+            ] ||
+            "Független";
 
         console.log(
-            `Geocoding: ${geoAddress || "NINCS_GEO"
-            }`
+            `Geocoding: ${name}`
         );
 
         const coords =
             await geocodeAddress(
-                geoAddress || address
+                address
             );
 
-        javitos.push({
-            id: String(i + 1),
-            name,
-            address,
-            phone,
-            email,
-            latitude:
-                coords.latitude,
-            longitude:
-                coords.longitude,
-        });
+        if (
+            coords.tryLevel ===
+            2
+        ) {
+            secondTrySuccess.push(
+                {
+                    name,
+                    address,
+                }
+            );
+        }
 
-        await new Promise((resolve) =>
-            setTimeout(resolve, 1200)
-        );
+        if (
+            coords.tryLevel ===
+            3
+        ) {
+            thirdTrySuccess.push(
+                {
+                    name,
+                    address,
+                }
+            );
+        }
+
+        if (
+            coords.tryLevel ===
+            0
+        ) {
+            failedGeocodes.push(
+                {
+                    name,
+                    address,
+                }
+            );
+
+            console.log(
+                `⚠️ ${name} (NO GEOCODE)`
+            );
+        } else {
+            console.log(
+                `✓ ${name} (TRY ${coords.tryLevel})`
+            );
+        }
+
+        const { error } =
+            await supabase
+                .from(
+                    "partners"
+                )
+                .insert({
+                    identifier,
+                    name,
+                    county,
+                    address,
+                    phone,
+                    email,
+
+                    latitude:
+                        coords.latitude ??
+                        47.4979,
+
+                    longitude:
+                        coords.longitude ??
+                        19.0402,
+
+                    partner_type,
+                    tax_number,
+                    customer_id,
+                    contact,
+                    postal_code,
+                    city,
+                    street,
+                });
+
+        if (error) {
+            console.log(
+                "\nINSERT ERROR:"
+            );
+
+            console.log(
+                name
+            );
+
+            console.log(
+                address
+            );
+
+            console.log(
+                error
+            );
+        }
     }
 
-    const output = `
-export const javitos = ${JSON.stringify(
-        javitos,
-        null,
-        2
-    )};
-`;
-
-    fs.writeFileSync(
-        "./data/javitos.ts",
-        output
+    console.log(
+        "\n========================"
     );
 
     console.log(
-        "javitos.ts sikeresen generálva!"
+        "IMPORT KÉSZ"
     );
+
+    console.log(
+        "========================\n"
+    );
+
+    console.log(
+        "⚠️ 2. TRY-RA SIKERÜLT:\n"
+    );
+
+    if (
+        secondTrySuccess.length ===
+        0
+    ) {
+        console.log(
+            "Nincs ilyen.\n"
+        );
+    } else {
+        secondTrySuccess.forEach(
+            (
+                item,
+                index
+            ) => {
+                console.log(
+                    `${index + 1}. ${item.name}`
+                );
+
+                console.log(
+                    `   ${item.address}\n`
+                );
+            }
+        );
+    }
+
+    console.log(
+        "\n⚠️ 3. TRY-RA SIKERÜLT:\n"
+    );
+
+    if (
+        thirdTrySuccess.length ===
+        0
+    ) {
+        console.log(
+            "Nincs ilyen.\n"
+        );
+    } else {
+        thirdTrySuccess.forEach(
+            (
+                item,
+                index
+            ) => {
+                console.log(
+                    `${index + 1}. ${item.name}`
+                );
+
+                console.log(
+                    `   ${item.address}\n`
+                );
+            }
+        );
+    }
+
+    console.log(
+        "\n❌ NEM GEOCODOLT:\n"
+    );
+
+    if (
+        failedGeocodes.length ===
+        0
+    ) {
+        console.log(
+            "✅ Minden partner geocodolva lett."
+        );
+    } else {
+        failedGeocodes.forEach(
+            (
+                item,
+                index
+            ) => {
+                console.log(
+                    `${index + 1}. ${item.name}`
+                );
+
+                console.log(
+                    `   ${item.address}\n`
+                );
+            }
+        );
+
+        console.log(
+            `Összesen: ${failedGeocodes.length} db`
+        );
+    }
 }
 
 run();

@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std/http/server.ts";
 
 import {
-    createClient,
+  createClient,
 } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -32,11 +32,19 @@ serve(async (req) => {
       await req.json();
 
     const {
-      name,
-      address,
-      phone,
-      email,
-    } = body;
+  identifier,
+  name,
+  address,
+  phone,
+  email,
+  partner_type,
+  tax_number,
+  customer_id,
+  contact,
+  postal_code,
+  city,
+  street,
+} = body;
 
     function cleanAddress(
       address: string
@@ -113,7 +121,7 @@ serve(async (req) => {
           headers:
           {
             "User-Agent":
-              "AVILOO-javito-Locator/1.0",
+              "AVILOO-partner-Locator/1.0",
           },
         }
       );
@@ -141,6 +149,8 @@ serve(async (req) => {
 
     const supabase =
       createClient(
+        console.log(
+          "SUPABASE_URL:",
         Deno.env.get(
           "SUPABASE_URL"
         )!,
@@ -150,26 +160,68 @@ serve(async (req) => {
       );
 
     const {
-      error,
-    } =
-      await supabase
-        .from(
-          "javitos"
-        )
-        .insert({
-          name,
-          address,
-          phone,
-          email,
-          latitude,
-          longitude,
-        });
+  data,
+  error,
+} =
+  await supabase
+    .from(
+      "partners"
+    )
+    .insert({
+  identifier,
 
-    if (
-      error
-    ) {
-      throw error;
-    }
+  name,
+
+  address,
+
+  phone,
+
+  email,
+
+  latitude,
+
+  longitude,
+
+  partner_type,
+
+  tax_number,
+
+  customer_id,
+
+  contact,
+
+  postal_code,
+
+  city,
+
+  street,
+})
+    .select();
+
+console.log(
+  "INSERTED DATA:",
+  data
+);
+
+console.log(
+  "INSERT ERROR:",
+  error
+);
+
+if (
+  error
+) {
+  throw error;
+}
+
+if (
+  !data ||
+  data.length === 0
+) {
+  throw new Error(
+    "Insert failed"
+  );
+}
 
     return new Response(
       JSON.stringify({

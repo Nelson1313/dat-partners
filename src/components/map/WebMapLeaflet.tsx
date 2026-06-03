@@ -22,38 +22,102 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-type javito = {
+type Partner = {
     id: string;
     name: string;
     address: string;
     latitude: number;
     longitude: number;
     phone?: string;
+    county?: string;
     email?: string;
+    partner_type?: string;
 };
 
 type Props = {
-    javitos: javito[];
-    selectedjavito?: javito | null;
+    partners: Partner[];
+    selectedPartner?: Partner | null;
 };
 
-const customIcon = L.icon({
-    iconUrl:
-        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
 
-    shadowUrl:
-        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+function getMarkerIcon(
+    type?: string
+) {
+    const color =
+        type ===
+            "Független"
+            ? "#63D471"
+            : type ===
+                "Márkaszervíz"
+                ? "#FFD400"
+                : "#FF5C8A";
 
-    iconSize: [28, 42],
-    iconAnchor: [14, 42],
-    popupAnchor: [0, -40],
-});
+    return L.divIcon({
+        className:
+            "custom-marker",
+
+        html: `
+        <div
+            style="
+                width:44px;
+                height:56px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                filter:
+                    drop-shadow(
+                        0 6px 14px
+                        rgba(0,0,0,.22)
+                    );
+            "
+        >
+            <svg
+                width="34"
+                height="46"
+                viewBox="0 0 44 56"
+                xmlns="http://www.w3.org/2000/svg"
+                style="
+                    overflow: visible;
+                "
+            >
+                <path
+                    d="
+                    M22 2
+                    C11.5 2 3 10.5 3 21
+                    C3 35.5 22 53 22 53
+                    C22 53 41 35.5 41 21
+                    C41 10.5 32.5 2 22 2
+                    Z
+                    "
+                    fill="${color}"
+                    stroke="#09142B"
+                    stroke-width="2.5"
+                    stroke-linejoin="round"
+                />
+
+                <circle
+                    cx="22"
+                    cy="21"
+                    r="8"
+                    fill="white"
+                />
+            </svg>
+        </div>
+        `,
+
+        iconSize: [44, 56],
+
+        iconAnchor: [22, 54],
+
+        popupAnchor: [0, -52],
+    });
+}
 
 function MapController({
-    selectedjavito,
+    selectedPartner,
     markerRefs,
 }: {
-    selectedjavito?: javito | null;
+    selectedPartner?: Partner | null;
     markerRefs: React.MutableRefObject<
         Record<
             string,
@@ -67,14 +131,14 @@ function MapController({
     // sidebar click
     useEffect(() => {
         if (
-            !selectedjavito
+            !selectedPartner
         )
             return;
 
         map.flyTo(
             [
-                selectedjavito.latitude,
-                selectedjavito.longitude,
+                selectedPartner.latitude,
+                selectedPartner.longitude,
             ],
             17,
             {
@@ -84,7 +148,7 @@ function MapController({
 
         const marker =
             markerRefs.current[
-            selectedjavito.id
+            selectedPartner.id
             ];
 
         map.once(
@@ -94,7 +158,7 @@ function MapController({
             }
         );
     }, [
-        selectedjavito,
+        selectedPartner,
         map,
         markerRefs,
     ]);
@@ -130,21 +194,21 @@ function MapController({
 }
 
 export default function WebMapLeaflet({
-    javitos,
-    selectedjavito,
+    partners,
+    selectedPartner,
 }: Props) {
     const markerRefs = useRef<
         Record<string, L.Marker | null>
     >({});
 
-    const validjavitos =
+    const validPartners =
         useMemo(() => {
-            return javitos.filter(
-                (javito) =>
-                    javito.latitude &&
-                    javito.longitude
+            return partners.filter(
+                (partner) =>
+                    partner.latitude &&
+                    partner.longitude
             );
-        }, [javitos]);
+        }, [partners]);
 
     return (
         <MapContainer
@@ -158,33 +222,37 @@ export default function WebMapLeaflet({
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
             <MapController
-                selectedjavito={
-                    selectedjavito
+                selectedPartner={
+                    selectedPartner
                 }
                 markerRefs={
                     markerRefs
                 }
             />
 
-            {validjavitos.map(
-                (javito) => (
+            {validPartners.map(
+                (partner) => (
                     <Marker
-                        key={javito.id}
+                        key={
+                            `${partner.id}-${partner.partner_type}`
+                        }
                         position={[
-                            javito.latitude,
-                            javito.longitude,
+                            partner.latitude,
+                            partner.longitude,
                         ]}
-                        icon={customIcon}
+                        icon={getMarkerIcon(
+                            partner.partner_type
+                        )}
                         ref={(ref) => {
                             markerRefs.current[
-                                javito.id
+                                partner.id
                             ] = ref;
                         }}
                         eventHandlers={{
                             click: () => {
                                 const marker =
                                     markerRefs.current[
-                                    javito.id
+                                    partner.id
                                     ];
 
                                 if (!marker)
@@ -198,11 +266,11 @@ export default function WebMapLeaflet({
                                 // bezárjuk az előző popupot
                                 map.closePopup();
 
-                                // zoom javitore
+                                // zoom partnerre
                                 map.flyTo(
                                     [
-                                        javito.latitude,
-                                        javito.longitude,
+                                        partner.latitude,
+                                        partner.longitude,
                                     ],
                                     17,
                                     {
@@ -234,27 +302,27 @@ export default function WebMapLeaflet({
                         >
                             <div className="popup-card">
                                 <div className="popup-title">
-                                    {javito.name}
+                                    {partner.name}
                                 </div>
 
                                 <div className="popup-address">
                                     <div className="popup-icon location">
                                         <MapPin
                                             size={18}
-                                            color="#003B7A"
+                                            color="#009DDF"
                                             strokeWidth={2.4}
                                         />
                                     </div>
 
                                     <span className="popup-address-text">
-                                        {javito.address}
+                                        {partner.address}
                                     </span>
                                 </div>
 
-                                {javito.phone && (
+                                {partner.phone && (
                                     <a
                                         className="popup-action popup-phone"
-                                        href={`tel:${javito.phone.replace(
+                                        href={`tel:${partner.phone.replace(
                                             /\s/g,
                                             ""
                                         )}`}
@@ -268,15 +336,15 @@ export default function WebMapLeaflet({
                                         </div>
 
                                         <span>
-                                            {javito.phone}
+                                            {partner.phone}
                                         </span>
                                     </a>
                                 )}
 
-                                {javito.email && (
+                                {partner.email && (
                                     <a
                                         className="popup-action popup-email"
-                                        href={`mailto:${javito.email}`}
+                                        href={`mailto:${partner.email}`}
                                     >
                                         <div className="popup-icon email">
                                             <Mail
@@ -287,14 +355,14 @@ export default function WebMapLeaflet({
                                         </div>
 
                                         <span>
-                                            {javito.email}
+                                            {partner.email}
                                         </span>
                                     </a>
                                 )}
 
                                 <a
                                     className="popup-route"
-                                    href={`https://www.google.com/maps/dir/?api=1&destination=${javito.latitude},${javito.longitude}`}
+                                    href={`https://www.google.com/maps/dir/?api=1&destination=${partner.latitude},${partner.longitude}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >

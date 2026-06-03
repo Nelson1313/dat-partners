@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std/http/server.ts";
 
 import {
-    createClient,
+  createClient,
 } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -45,7 +45,7 @@ serve(async (req) => {
     } =
       await supabase
         .from(
-          "javitos"
+          "partners"
         )
         .delete()
         .eq(

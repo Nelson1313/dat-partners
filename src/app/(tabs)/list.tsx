@@ -1,6 +1,7 @@
 import { router, useFocusEffect } from "expo-router";
 import {
     FlatList,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
@@ -15,44 +16,88 @@ import {
 } from "lucide-react";
 
 import {
-    useJavitosStore,
-} from "../../store/javitosStore";
+    usePartnersStore,
+} from "../../store/partnersStore";
 
 
 import {
     useCallback,
     useMemo,
-    useState
+    useRef,
+    useState,
 } from "react";
 
 import {
-    setSelectedjavito,
+    setSelectedPartner,
 } from "../../store/mapStore";
 
 export default function ListScreen() {
     const [search, setSearch] =
         useState("");
 
+    const [
+        selectedCounty,
+        setSelectedCounty,
+    ] = useState<string | null>(
+        null
+    );
+
+    const [
+        selectedType,
+        setSelectedType,
+    ] = useState<string | null>(
+        null
+    );
+
+    const countyScrollRef =
+        useRef<any>(null);
+
+    const isDraggingRef =
+        useRef(false);
+
+    const startXRef =
+        useRef(0);
+
+    const scrollLeftRef =
+        useRef(0);
+
     const {
-        javitos,
-        fetchJavitos,
+        partners,
+        fetchPartners,
     } =
-        useJavitosStore();
+        usePartnersStore();
 
     useFocusEffect(
         useCallback(() => {
             const load =
                 async () => {
-                    await fetchJavitos();
+                    await fetchPartners();
                 };
 
             load();
         }, [])
     );
 
-    const filteredjavitos =
+    const counties =
+        [
+            ...new Set(
+                partners
+                    .map(
+                        (p) =>
+                            p.county
+                    )
+                    .filter(
+                        (
+                            county
+                        ): county is string =>
+                            !!county
+                    )
+            ),
+        ].sort();
+
+    const filteredPartners =
         useMemo(() => {
-            return [...javitos]
+            return [...partners]
                 .sort((a, b) => {
                     const zipA =
                         parseInt(
@@ -72,28 +117,58 @@ export default function ListScreen() {
                         zipA - zipB
                     );
                 })
-                .filter(
-                    (javito) => {
-                        const query =
-                            search.toLowerCase();
+                .filter((partner) => {
+                    const partnerType =
+                        partner.partner_type ??
+                        "Független";
 
-                        return (
-                            javito.name
+                    const matchesType =
+                        selectedType
+                            ? partnerType ===
+                            selectedType
+                            : true;
+
+                    const matchesCounty =
+                        selectedCounty
+                            ? partner.county
+                                ?.trim()
+                                .toLowerCase() ===
+                            selectedCounty
+                                .trim()
                                 .toLowerCase()
-                                .includes(
-                                    query
-                                ) ||
-                            javito.address
-                                .toLowerCase()
-                                .includes(
-                                    query
-                                )
-                        );
-                    }
-                );
+                            : true;
+
+                    const query =
+                        search.toLowerCase();
+
+                    const matchesSearch =
+                        partner.name
+                            ?.toLowerCase()
+                            .includes(query) ||
+
+                        partner.address
+                            ?.toLowerCase()
+                            .includes(query) ||
+
+                        partner.email
+                            ?.toLowerCase()
+                            .includes(query) ||
+
+                        partner.phone
+                            ?.toLowerCase()
+                            .includes(query);
+
+                    return (
+                        matchesType &&
+                        matchesCounty &&
+                        matchesSearch
+                    );
+                })
         }, [
             search,
-            javitos,
+            partners,
+            selectedCounty,
+            selectedType,
         ]);
 
     return (
@@ -130,7 +205,7 @@ export default function ListScreen() {
                                 styles.activeTabText
                             }
                         >
-                            javitoek
+                            Javítók
                         </Text>
                     </View>
                 </View>
@@ -149,7 +224,7 @@ export default function ListScreen() {
                             styles.title
                         }
                     >
-                        javitoek
+                        Javítók
                     </Text>
 
                     <Text
@@ -158,29 +233,235 @@ export default function ListScreen() {
                         }
                     >
                         {
-                            filteredjavitos.length
+                            filteredPartners.length
                         }{" "}
-                        javito
+                        partner
                     </Text>
                 </View>
 
+                <View style={styles.filtersBar}>
+                    <div
+                        style={{
+                            width: "100%",
+                            cursor: "grab",
+                        }}
+                        onMouseDown={(e) => {
+                            isDraggingRef.current =
+                                true;
+
+                            startXRef.current =
+                                e.pageX;
+                        }}
+                        onMouseUp={() => {
+                            isDraggingRef.current =
+                                false;
+                        }}
+                        onMouseLeave={() => {
+                            isDraggingRef.current =
+                                false;
+                        }}
+                        onMouseMove={(e) => {
+                            if (
+                                !isDraggingRef.current
+                            )
+                                return;
+
+                            const walk =
+                                (startXRef.current -
+                                    e.pageX) * 1.8;
+
+                            countyScrollRef.current?.scrollTo({
+                                x:
+                                    scrollLeftRef.current +
+                                    walk,
+                                animated: false,
+                            });
+                        }}
+                    >
+                        <ScrollView
+                            ref={countyScrollRef}
+                            horizontal
+                            scrollEventThrottle={32}
+                            showsHorizontalScrollIndicator={
+                                false
+                            }
+                            onScroll={(e) => {
+                                scrollLeftRef.current =
+                                    e.nativeEvent.contentOffset.x;
+                            }}
+                            contentContainerStyle={{
+                                gap: 10,
+                                paddingRight: 20,
+                                alignItems:
+                                    "center",
+                            }}
+                        >
+                            <TouchableOpacity
+                                onPress={() =>
+                                    setSelectedCounty(
+                                        null
+                                    )
+                                }
+                                style={[
+                                    styles.filterChip,
+                                    !selectedCounty &&
+                                    styles.activeChip,
+                                ]}
+                            >
+                                <Text
+                                    style={[
+                                        styles.filterChipText,
+                                        !selectedCounty &&
+                                        styles.activeChipText,
+                                    ]}
+                                >
+                                    Összes
+                                </Text>
+                            </TouchableOpacity>
+
+                            {counties.map(
+                                (county) => (
+                                    <TouchableOpacity
+                                        key={county}
+                                        onPress={() =>
+                                            setSelectedCounty(
+                                                county
+                                            )
+                                        }
+                                        style={[
+                                            styles.filterChip,
+                                            selectedCounty ===
+                                            county &&
+                                            styles.activeChip,
+                                        ]}
+                                    >
+                                        <Text
+                                            style={[
+                                                styles.filterChipText,
+                                                selectedCounty ===
+                                                county &&
+                                                styles.activeChipText,
+                                            ]}
+                                        >
+                                            {county}
+                                        </Text>
+                                    </TouchableOpacity>
+                                )
+                            )}
+                        </ScrollView>
+                    </div>
+
+                    <View style={styles.typeFilters}>
+                        {[
+                            "Független",
+                            "Márkaszervíz",
+                            "Értékelő",
+                        ].map((type) => (
+                            <TouchableOpacity
+                                key={type}
+                                onPress={() =>
+                                    setSelectedType(
+                                        selectedType ===
+                                            type
+                                            ? null
+                                            : type
+                                    )
+                                }
+                                style={[
+                                    styles.legendItem,
+
+                                    type ===
+                                    "Független" && {
+                                        borderColor:
+                                            "#63D471",
+                                    },
+
+                                    type ===
+                                    "Márkaszervíz" && {
+                                        borderColor:
+                                            "#FFD400",
+                                    },
+
+                                    type ===
+                                    "Értékelő" && {
+                                        borderColor:
+                                            "#FF5C8A",
+                                    },
+
+                                    selectedType ===
+                                    type && {
+                                        backgroundColor:
+                                            type ===
+                                                "Független"
+                                                ? "#63D471"
+                                                : type ===
+                                                    "Márkaszervíz"
+                                                    ? "#FFD400"
+                                                    : "#FF5C8A",
+                                    },
+                                ]}
+                            >
+                                <Text
+                                    style={[
+                                        styles.legendText,
+                                        selectedType ===
+                                        type && {
+                                            color:
+                                                "#09142B",
+                                        },
+                                    ]}
+                                >
+                                    {type}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </View>
+
                 {/* search */}
-                <TextInput
-                    placeholder="Keresés név vagy cím alapján..."
-                    placeholderTextColor="#94A3B8"
-                    value={search}
-                    onChangeText={
-                        setSearch
-                    }
-                    style={
-                        styles.search
-                    }
-                />
+                <View style={styles.searchContainer}>
+                    <Text
+                        style={
+                            styles.searchIcon
+                        }
+                    >
+                        🔍
+                    </Text>
+
+                    <TextInput
+                        placeholder="Keresés név, cím vagy város alapján..."
+                        placeholderTextColor="#6F86B7"
+                        value={search}
+                        onChangeText={
+                            setSearch
+                        }
+                        style={
+                            styles.searchInput
+                        }
+                    />
+
+                    {search.length >
+                        0 && (
+                            <TouchableOpacity
+                                onPress={() =>
+                                    setSearch("")
+                                }
+                            >
+                                <Text
+                                    style={
+                                        styles.clearText
+                                    }
+                                >
+                                    ✕
+                                </Text>
+                            </TouchableOpacity>
+                        )}
+                </View>
 
                 {/* list */}
                 <FlatList
                     data={
-                        filteredjavitos
+                        filteredPartners
                     }
                     keyExtractor={(
                         item
@@ -206,13 +487,13 @@ export default function ListScreen() {
                                 0.9
                             }
                             onPress={() => {
-                                setSelectedjavito(
+                                setSelectedPartner(
                                     item.id
                                 );
 
                                 router.push({
                                     pathname:
-                                        "/javito/[id]",
+                                        "/partner/[id]",
 
                                     params: {
                                         id: item.id,
@@ -221,9 +502,26 @@ export default function ListScreen() {
                             }}
                         >
                             <View
-                                style={
-                                    styles.dot
-                                }
+                                style={[
+                                    styles.typeBar,
+
+                                    item.partner_type ===
+                                        "Független"
+                                        ? {
+                                            backgroundColor:
+                                                "#63D471",
+                                        }
+                                        : item.partner_type ===
+                                            "Márkaszervíz"
+                                            ? {
+                                                backgroundColor:
+                                                    "#FFD400",
+                                            }
+                                            : {
+                                                backgroundColor:
+                                                    "#FF5C8A",
+                                            },
+                                ]}
                             />
 
                             <View
@@ -231,57 +529,160 @@ export default function ListScreen() {
                                     styles.info
                                 }
                             >
-                                <Text
-                                    style={
-                                        styles.javitoName
-                                    }
-                                >
-                                    {
-                                        item.name
-                                    }
-                                </Text>
-
-                                <View style={styles.infoRow}>
-                                    <MapPin
-                                        size={16}
-                                        color="#003B7A"
-                                        strokeWidth={2.4}
-                                    />
-
-                                    <Text style={styles.infoText}>
-                                        {item.address}
+                                <View style={styles.partnerMain}>
+                                    <Text
+                                        style={
+                                            styles.partnerName
+                                        }
+                                    >
+                                        {
+                                            item.name
+                                        }
                                     </Text>
+
+                                    <View
+                                        style={[
+                                            styles.partnerTypeBadge,
+                                            item.partner_type ===
+                                                "Független"
+                                                ? styles.independentBadge
+                                                : item.partner_type ===
+                                                    "Márkaszervíz"
+                                                    ? styles.brandBadge
+                                                    : styles.evaluatorBadge,
+                                        ]}
+                                    >
+                                        <Text
+                                            style={
+                                                styles.partnerTypeText
+                                            }
+                                        >
+                                            {item.partner_type ??
+                                                "Független"}
+                                        </Text>
+                                    </View>
+
+                                    <View style={styles.infoRow}>
+                                        <MapPin
+                                            size={16}
+                                            color="#009DDF"
+                                            strokeWidth={2.4}
+                                        />
+
+                                        <Text style={styles.infoText}>
+                                            {item.address}
+                                        </Text>
+                                    </View>
+
+                                    <View style={styles.infoRow}>
+                                        <Phone
+                                            size={16}
+                                            color="#EC4899"
+                                            strokeWidth={2.4}
+                                        />
+
+                                        <Text style={styles.infoText}>
+                                            {item.phone}
+                                        </Text>
+                                    </View>
+
+                                    <View style={styles.infoRow}>
+                                        <Mail
+                                            size={16}
+                                            color="#8B5CF6"
+                                            strokeWidth={2.4}
+                                        />
+
+                                        <Text style={styles.infoText}>
+                                            {item.email}
+                                        </Text>
+                                    </View>
                                 </View>
+                                <View style={styles.partnerMeta}>
+                                    {!!item.tax_number && (
+                                        <View
+                                            style={
+                                                styles.metaItem
+                                            }
+                                        >
+                                            <Text
+                                                style={
+                                                    styles.metaLabel
+                                                }
+                                            >
+                                                Adószám
+                                            </Text>
 
-                                <View style={styles.infoRow}>
-                                    <Phone
-                                        size={16}
-                                        color="#EC4899"
-                                        strokeWidth={2.4}
-                                    />
+                                            <Text
+                                                style={
+                                                    styles.metaValue
+                                                }
+                                            >
+                                                {
+                                                    item.tax_number
+                                                }
+                                            </Text>
+                                        </View>
+                                    )}
 
-                                    <Text style={styles.infoText}>
-                                        {item.phone}
-                                    </Text>
-                                </View>
+                                    {!!item.contact && (
+                                        <View
+                                            style={
+                                                styles.metaItem
+                                            }
+                                        >
+                                            <Text
+                                                style={
+                                                    styles.metaLabel
+                                                }
+                                            >
+                                                Kapcsolattartó
+                                            </Text>
 
-                                <View style={styles.infoRow}>
-                                    <Mail
-                                        size={16}
-                                        color="#8B5CF6"
-                                        strokeWidth={2.4}
-                                    />
+                                            <Text
+                                                style={
+                                                    styles.metaValue
+                                                }
+                                            >
+                                                {
+                                                    item.contact
+                                                }
+                                            </Text>
+                                        </View>
+                                    )}
 
-                                    <Text style={styles.infoText}>
-                                        {item.email}
-                                    </Text>
+                                    {!!item.customer_id && (
+                                        <View
+                                            style={
+                                                styles.metaItem
+                                            }
+                                        >
+                                            <Text
+                                                style={
+                                                    styles.metaLabel
+                                                }
+                                            >
+                                                Ügyfélszám
+                                            </Text>
+
+                                            <Text
+                                                style={
+                                                    styles.metaValue
+                                                }
+                                            >
+                                                {
+                                                    item.customer_id
+                                                }
+                                            </Text>
+                                        </View>
+                                    )}
                                 </View>
                             </View>
                         </TouchableOpacity>
                     )}
                 />
             </View>
-        </View>
+        </View >
     );
 }
 
@@ -290,14 +691,14 @@ const styles =
         container: {
             flex: 1,
             backgroundColor:
-                "#F5F7FA",
+                "#071021",
             padding: 14,
         },
 
         topbar: {
             height: 58,
             backgroundColor:
-                "#FFFFFF",
+                "#0B1633",
             borderRadius: 18,
             paddingHorizontal: 18,
             marginBottom: 14,
@@ -305,7 +706,15 @@ const styles =
             alignItems: "center",
             borderWidth: 1,
             borderColor:
-                "#EEF2F6",
+                "#13254D",
+            shadowColor:
+                "#000",
+
+            shadowOpacity:
+                0.18,
+
+            shadowRadius:
+                20,
         },
 
         segmented: {
@@ -316,19 +725,19 @@ const styles =
 
         activeTab: {
             backgroundColor:
-                "#003B7A",
+                "#FFD400",
             borderRadius: 12,
             paddingHorizontal: 16,
             paddingVertical: 8,
         },
 
         activeTabText: {
-            color: "#FFFFFF",
+            color: "#09142B",
             fontWeight: "700",
         },
 
         tabText: {
-            color: "#64748B",
+            color: "#B7C6E0",
             fontWeight: "600",
             fontSize: 15,
         },
@@ -336,12 +745,12 @@ const styles =
         content: {
             flex: 1,
             backgroundColor:
-                "white",
+                "#0B1633",
             borderRadius: 26,
             padding: 24,
             borderWidth: 1,
             borderColor:
-                "#E9EEF4",
+                "#13254D",
         },
 
         headerRow: {
@@ -355,11 +764,11 @@ const styles =
         title: {
             fontSize: 28,
             fontWeight: "800",
-            color: "#003B7A",
+            color: "#FFFFFF",
         },
 
         count: {
-            color: "#64748B",
+            color: "#8AA2D3",
             fontWeight: "600",
         },
 
@@ -367,10 +776,11 @@ const styles =
             height: 54,
             borderRadius: 18,
             backgroundColor:
-                "#F8FAFC",
+                "#112043",
             borderWidth: 1,
             borderColor:
-                "#E2E8F0",
+                "#223B73",
+            color: "#FFFFFF",
             paddingHorizontal: 18,
             fontSize: 15,
             marginBottom: 20,
@@ -378,14 +788,14 @@ const styles =
 
         card: {
             flexDirection: "row",
-            backgroundColor:
-                "#FFFFFF",
-            borderRadius: 22,
-            padding: 20,
-            marginBottom: 12,
+            borderRadius: 24,
+            paddingVertical: 18,
+            paddingHorizontal: 22,
+            marginBottom: 14,
             borderWidth: 1,
-            borderColor:
-                "#E8EDF3",
+
+            alignItems:
+                "flex-start",
         },
 
         dot: {
@@ -393,19 +803,24 @@ const styles =
             height: 12,
             borderRadius: 999,
             backgroundColor:
-                "#003B7A",
+                "#009DDF",
             marginTop: 6,
             marginRight: 14,
         },
 
         info: {
             flex: 1,
+            flexDirection: "row",
+            alignItems:
+                "flex-start",
+
+            minHeight: 0,
         },
 
-        javitoName: {
+        partnerName: {
             fontSize: 18,
             fontWeight: "700",
-            color: "#003B7A",
+            color: "#FFFFFF",
             marginBottom: 8,
         },
 
@@ -421,14 +836,18 @@ const styles =
 
         cardLight: {
             backgroundColor:
-                "#FFFFFF",
+                "#101F42",
+
+            borderColor:
+                "#20386B",
         },
 
         cardDark: {
             backgroundColor:
-                "#FAFCFE",
+                "#0E1B39",
+
             borderColor:
-                "#E6EDF5",
+                "#1C3363",
         },
         infoRow: {
             flexDirection: "row",
@@ -438,8 +857,191 @@ const styles =
         },
 
         infoText: {
-            color: "#64748B",
+            color: "#B7C6E0",
             fontSize: 14,
             fontWeight: "500",
+        },
+
+        partnerTypeBadge: {
+            alignSelf: "flex-start",
+
+            paddingHorizontal: 10,
+
+            paddingVertical: 5,
+
+            borderRadius: 999,
+
+            marginTop: 8,
+        },
+
+        partnerTypeText: {
+            color: "#0B1633",
+
+            fontWeight: "700",
+
+            fontSize: 12,
+        },
+
+        independentBadge: {
+            backgroundColor:
+                "#63D471",
+        },
+
+        brandBadge: {
+            backgroundColor:
+                "#FFD400",
+        },
+
+        evaluatorBadge: {
+            backgroundColor:
+                "#FF5C8A",
+        },
+
+        searchContainer: {
+            height: 58,
+            borderRadius: 20,
+            backgroundColor:
+                "#101F42",
+
+            borderWidth: 1,
+            borderColor:
+                "#20386B",
+
+            flexDirection:
+                "row",
+
+            alignItems:
+                "center",
+
+            paddingHorizontal:
+                18,
+
+            marginBottom:
+                20,
+        },
+
+        searchInput: {
+            flex: 1,
+            color: "#FFFFFF",
+            fontSize: 15,
+            fontWeight: "500",
+        },
+
+        searchIcon: {
+            fontSize: 18,
+            marginRight: 10,
+        },
+
+        clearText: {
+            color: "#7A93C7",
+            fontSize: 18,
+            fontWeight: "700",
+        },
+
+        typeBar: {
+            width: 5,
+            borderRadius: 999,
+            marginRight: 16,
+            alignSelf: "stretch",
+        },
+
+        filtersBar: {
+            marginBottom: 18,
+            gap: 14,
+        },
+
+        typeFilters: {
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 10,
+        },
+
+        legendItem: {
+            height: 42,
+            borderRadius: 14,
+            paddingHorizontal: 14,
+            backgroundColor:
+                "#112043",
+            justifyContent:
+                "center",
+
+            borderWidth: 2,
+        },
+
+        legendItemActive: {
+            backgroundColor:
+                "#FFD400",
+        },
+
+        legendText: {
+            color: "#FFFFFF",
+            fontWeight: "700",
+        },
+
+        filterChip: {
+            height: 40,
+            borderRadius: 12,
+            paddingHorizontal: 14,
+            justifyContent:
+                "center",
+            backgroundColor:
+                "#112043",
+        },
+
+        activeChip: {
+            backgroundColor:
+                "#FFD400",
+        },
+
+        filterChipText: {
+            color: "#AFC0E0",
+            fontWeight: "600",
+        },
+
+        activeChipText: {
+            color: "#09142B",
+            fontWeight: "700",
+        },
+        partnerMain: {
+            flex: 1,
+            paddingRight: 20,
+        },
+
+        partnerMeta: {
+            width: 260,
+
+            marginLeft: "auto",
+
+            alignSelf:
+                "flex-start",
+
+            marginTop: 4,
+
+            paddingLeft: 28,
+
+            borderLeftWidth: 1,
+
+            borderLeftColor:
+                "#203A6E",
+
+            gap: 18,
+        },
+
+        metaItem: {
+            gap: 4,
+        },
+
+        metaLabel: {
+            color: "#8EA4CC",
+            fontSize: 12,
+            fontWeight: "700",
+            textTransform:
+                "uppercase",
+        },
+
+        metaValue: {
+            color: "#FFFFFF",
+            fontSize: 14,
+            fontWeight: "700",
         },
     });

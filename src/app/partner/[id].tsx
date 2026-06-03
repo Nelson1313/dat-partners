@@ -8,8 +8,8 @@ import {
 } from "react-native";
 
 import {
-    useJavitosStore,
-} from "../../store/javitosStore";
+    usePartnersStore,
+} from "../../store/partnersStore";
 
 import {
     Mail,
@@ -20,37 +20,37 @@ import {
 import { useEffect } from "react";
 
 
-export default function javitoDetail() {
+export default function PartnerDetail() {
     const { id } =
         useLocalSearchParams();
 
     const {
-        javitos,
-        fetchJavitos,
+        partners,
+        fetchPartners,
     } =
-        useJavitosStore();
+        usePartnersStore();
 
     useEffect(() => {
-        fetchJavitos();
+        fetchPartners();
     }, []);
 
-    const javito =
-        javitos.find(
+    const partner =
+        partners.find(
             (p) =>
                 String(p.id) ===
                 String(id)
         );
 
     if (
-        javitos.length === 0
+        partners.length === 0
     ) {
         return null;
     }
 
-    if (!javito) {
+    if (!partner) {
         return (
             <Text>
-                javito nem található
+                Javító nem található
             </Text>
         );
     }
@@ -58,7 +58,7 @@ export default function javitoDetail() {
     const openMaps = () => {
         const query =
             encodeURIComponent(
-                javito.address
+                partner.address
             );
 
         Linking.openURL(
@@ -66,13 +66,13 @@ export default function javitoDetail() {
         );
     };
 
-    const calljavito =
+    const callPartner =
         () => {
             if (
-                javito.phone
+                partner.phone
             ) {
                 Linking.openURL(
-                    `tel:${javito.phone}`
+                    `tel:${partner.phone}`
                 );
             }
         };
@@ -80,10 +80,10 @@ export default function javitoDetail() {
     const sendEmail =
         () => {
             if (
-                javito.email
+                partner.email
             ) {
                 Linking.openURL(
-                    `mailto:${javito.email}`
+                    `mailto:${partner.email}`
                 );
             }
         };
@@ -110,10 +110,10 @@ export default function javitoDetail() {
             <View style={styles.card}>
                 <Text
                     style={
-                        styles.javitoName
+                        styles.partnerName
                     }
                 >
-                    {javito.name}
+                    {partner.name}
                 </Text>
 
                 <Text
@@ -121,7 +121,7 @@ export default function javitoDetail() {
                         styles.subtitle
                     }
                 >
-                    javito adatok
+                    Partner adatok
                 </Text>
 
                 {/* address */}
@@ -139,7 +139,7 @@ export default function javitoDetail() {
                         >
                             <MapPin
                                 size={18}
-                                color="#003B7A"
+                                color="#009DDF"
                                 strokeWidth={2.4}
                             />
                         </View>
@@ -163,7 +163,7 @@ export default function javitoDetail() {
                                 }
                             >
                                 {
-                                    javito.address
+                                    partner.address
                                 }
                             </Text>
                         </View>
@@ -171,14 +171,13 @@ export default function javitoDetail() {
                 </View>
 
                 {/* phone */}
-                {!!javito.phone && (
+                {!!partner.phone && (
                     <TouchableOpacity
-                        style={[
-                            styles.infoCard,
-                            styles.phoneCard,
-                        ]}
+                        style={
+                            styles.infoCard
+                        }
                         onPress={
-                            calljavito
+                            callPartner
                         }
                     >
                         <View style={styles.row}>
@@ -214,7 +213,7 @@ export default function javitoDetail() {
                                     }
                                 >
                                     {
-                                        javito.phone
+                                        partner.phone
                                     }
                                 </Text>
                             </View>
@@ -223,12 +222,11 @@ export default function javitoDetail() {
                 )}
 
                 {/* email */}
-                {!!javito.email && (
+                {!!partner.email && (
                     <TouchableOpacity
-                        style={[
-                            styles.infoCard,
-                            styles.emailCard,
-                        ]}
+                        style={
+                            styles.infoCard
+                        }
                         onPress={
                             sendEmail
                         }
@@ -266,9 +264,76 @@ export default function javitoDetail() {
                                     }
                                 >
                                     {
-                                        javito.email
+                                        partner.email
                                     }
                                 </Text>
+                                <View style={styles.extraInfo}>
+                                    {!!partner.tax_number && (
+                                        <View style={styles.extraRow}>
+                                            <Text
+                                                style={
+                                                    styles.extraLabel
+                                                }
+                                            >
+                                                Adószám
+                                            </Text>
+
+                                            <Text
+                                                style={
+                                                    styles.extraValue
+                                                }
+                                            >
+                                                {
+                                                    partner.tax_number
+                                                }
+                                            </Text>
+                                        </View>
+                                    )}
+
+                                    {!!partner.contact && (
+                                        <View style={styles.extraRow}>
+                                            <Text
+                                                style={
+                                                    styles.extraLabel
+                                                }
+                                            >
+                                                Kapcsolattartó
+                                            </Text>
+
+                                            <Text
+                                                style={
+                                                    styles.extraValue
+                                                }
+                                            >
+                                                {
+                                                    partner.contact
+                                                }
+                                            </Text>
+                                        </View>
+                                    )}
+
+                                    {!!partner.customer_id && (
+                                        <View style={styles.extraRow}>
+                                            <Text
+                                                style={
+                                                    styles.extraLabel
+                                                }
+                                            >
+                                                Ügyfélszám
+                                            </Text>
+
+                                            <Text
+                                                style={
+                                                    styles.extraValue
+                                                }
+                                            >
+                                                {
+                                                    partner.customer_id
+                                                }
+                                            </Text>
+                                        </View>
+                                    )}
+                                </View>
                             </View>
                         </View>
                     </TouchableOpacity>
@@ -313,8 +378,8 @@ const styles =
         container: {
             flex: 1,
             backgroundColor:
-                "#F6F8FB",
-            padding: 18,
+                "#071021",
+            padding: 22,
         },
 
         emptyContainer: {
@@ -333,100 +398,129 @@ const styles =
         },
 
         backButton: {
+            height: 44,
+            alignSelf: "flex-start",
+
+            paddingHorizontal: 18,
+
+            borderRadius: 14,
+
+            backgroundColor:
+                "#0F1C37",
+
+            borderWidth: 1,
+
+            borderColor:
+                "#203A6E",
+
+            justifyContent:
+                "center",
+
             marginBottom: 22,
         },
 
         backText: {
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: "700",
-            color: "#003B7A",
+            color: "#FFD400",
         },
 
         card: {
             backgroundColor:
-                "#FFFFFF",
-            borderRadius: 28,
-            padding: 22,
+                "#09142B",
+
+            borderRadius: 30,
+
+            padding: 24,
+
             borderWidth: 1,
+
             borderColor:
-                "#E9EEF4",
+                "#203A6E",
 
             shadowColor:
                 "#000",
+
             shadowOffset: {
                 width: 0,
                 height: 12,
             },
-            shadowOpacity: 0.08,
-            shadowRadius: 30,
 
-            elevation: 10,
+            shadowOpacity: 0.25,
+
+            shadowRadius: 24,
+
+            elevation: 8,
         },
 
-        javitoName: {
-            fontSize: 26,
+        partnerName: {
+            fontSize: 28,
             fontWeight: "800",
-            color: "#003B7A",
-            marginBottom: 6,
+            color: "#FFFFFF",
+            marginBottom: 8,
         },
 
         subtitle: {
-            color: "#64748B",
-            fontSize: 15,
+            color: "#FFD400",
+            fontSize: 13,
+            fontWeight: "800",
+            textTransform:
+                "uppercase",
+            letterSpacing: 1.2,
             marginBottom: 26,
         },
 
         infoCard: {
             backgroundColor:
-                "#F8FAFC",
-            borderRadius: 20,
-            padding: 16,
-            marginBottom: 16,
+                "#112043",
+
+            borderRadius: 22,
+
+            padding: 18,
+
+            marginBottom: 14,
+
             borderWidth: 1,
-            borderColor:
-                "#E7EEF6",
-        },
 
-        phoneCard: {
-            backgroundColor:
-                "#EEF8FF",
             borderColor:
-                "#D7EBFB",
-        },
-
-        emailCard: {
-            backgroundColor:
-                "#F7F4FF",
-            borderColor:
-                "#ECE6FF",
+                "#203A6E",
         },
 
         label: {
-            fontSize: 14,
-            color: "#64748B",
-            marginBottom: 8,
+            fontSize: 13,
+            color: "#FFD400",
+            marginBottom: 6,
             fontWeight: "700",
+            textTransform:
+                "uppercase",
         },
 
         value: {
-            fontSize: 18,
-            color: "#003B7A",
+            fontSize: 16,
+            color: "#FFFFFF",
             fontWeight: "700",
         },
 
         routeButton: {
-            marginTop: 8,
-            borderRadius: 22,
-            paddingVertical: 18,
-            alignItems: "center",
+            marginTop: 10,
+
+            borderRadius: 20,
+
+            height: 58,
+
+            alignItems:
+                "center",
+
+            justifyContent:
+                "center",
 
             backgroundColor:
-                "#003B7A",
+                "#FFD400",
         },
 
         routeButtonText: {
-            color: "#FFF",
-            fontSize: 17,
+            color: "#09142B",
+            fontSize: 16,
             fontWeight: "800",
         },
 
@@ -452,22 +546,52 @@ const styles =
 
         locationIcon: {
             backgroundColor:
-                "rgba(0,157,223,.10)",
+                "#0F1C37",
         },
 
         phoneIcon: {
             backgroundColor:
-                "rgba(236,72,153,.10)",
+                "#0F1C37",
         },
 
         emailIcon: {
             backgroundColor:
-                "rgba(139,92,246,.10)",
+                "#0F1C37",
         },
 
         routeRow: {
             flexDirection: "row",
             alignItems: "center",
             gap: 8,
+        },
+        extraInfo: {
+            marginTop: 18,
+            paddingTop: 16,
+
+            borderTopWidth: 1,
+
+            borderTopColor:
+                "#203A6E",
+
+            gap: 12,
+        },
+
+        extraRow: {
+            flexDirection: "row",
+            justifyContent:
+                "space-between",
+            alignItems: "center",
+        },
+
+        extraLabel: {
+            color: "#8EA4CC",
+            fontSize: 13,
+            fontWeight: "700",
+        },
+
+        extraValue: {
+            color: "#FFFFFF",
+            fontSize: 14,
+            fontWeight: "700",
         },
     });

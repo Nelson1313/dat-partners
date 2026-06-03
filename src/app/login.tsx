@@ -125,7 +125,7 @@ export default function Login() {
                 >
                     <Image
                         source={require(
-                            "../../assets/dat-logo.jpg"
+                            "../../assets/dat-logo.png"
                         )}
                         style={
                             styles.logoImage
@@ -247,7 +247,7 @@ const styles =
 
         button: {
             backgroundColor:
-                "#003B7A",
+                "#009DDF",
 
             height: 58,
 

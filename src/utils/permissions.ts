@@ -8,12 +8,12 @@ export const isUser = (
 ) =>
     role === "user";
 
-export const canEditjavitos = (
+export const canEditPartners = (
     role?: string | null
 ) =>
     role === "admin";
 
-export const canDeletejavitos = (
+export const canDeletePartners = (
     role?: string | null
 ) =>
     role === "admin";

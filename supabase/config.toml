@@ -1,33 +1,33 @@
 
-[functions.geocode-javito]
+[functions.geocode-partner]
 enabled = true
 verify_jwt = false
-import_map = "./functions/geocode-javito/deno.json"
+import_map = "./functions/geocode-partner/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/geocode-javito/index.ts"
+entrypoint = "./functions/geocode-partner/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/geocode-javito/*.html" ]
+# static_files = [ "./functions/geocode-partner/*.html" ]
 
-[functions.update-javito]
+[functions.update-partner]
 enabled = true
 verify_jwt = false
-import_map = "./functions/update-javito/deno.json"
+import_map = "./functions/update-partner/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/update-javito/index.ts"
+entrypoint = "./functions/update-partner/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/update-javito/*.html" ]
+# static_files = [ "./functions/update-partner/*.html" ]
 
-[functions.delete-javito]
+[functions.delete-partner]
 enabled = true
 verify_jwt = false
-import_map = "./functions/delete-javito/deno.json"
+import_map = "./functions/delete-partner/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/delete-javito/index.ts"
+entrypoint = "./functions/delete-partner/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/delete-javito/*.html" ]
+# static_files = [ "./functions/delete-partner/*.html" ]

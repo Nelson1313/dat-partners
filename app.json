@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "DAT javito Hálózat",
-    "slug": "dat-javito-halozat",
+    "name": "DAT partner Hálózat",
+    "slug": "dat-partner-halozat",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "dat-javito-halozat",
+    "scheme": "dat-partner-halozat",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.zuhn13.datjavitohalozat",
+      "bundleIdentifier": "com.zuhn13.datpartnerhalozat",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -22,7 +22,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.zuhn13.datjavitohalozat"
+      "package": "com.zuhn13.datpartnerhalozat"
     },
     "web": {
       "output": "static",

@@ -6,14 +6,14 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
-  canEditjavitos,
+  canEditPartners,
 } from "../../utils/permissions";
 
 import { useAuthStore } from "../../store/authStore";
@@ -21,6 +21,7 @@ import { useAuthStore } from "../../store/authStore";
 import {
   Platform,
 } from "react-native";
+
 
 import {
   Building2,
@@ -34,8 +35,9 @@ import {
   X
 } from "lucide-react";
 
+
 import WebMap from "@/components/map/WebMap";
-import { useJavitosStore } from "../../store/javitosStore";
+import { usePartnersStore } from "../../store/partnersStore";
 
 let WebMapLeaflet:
   any = null;
@@ -54,30 +56,48 @@ if (
 
 export default function MapScreen() {
 
-  const closejavitoModal =
+
+  const countyScrollRef =
+    useRef<any>(null);
+
+  const isDraggingRef =
+    useRef(false);
+
+  const startXRef =
+    useRef(0);
+
+  const scrollLeftRef =
+    useRef(0);
+
+  const [search, setSearch] =
+    useState("");
+
+  const closePartnerModal =
     () => {
-      setShowjavitoModal(
+      setShowPartnerModal(
         false
       );
 
+      fetchPartners();
+
       setTimeout(() => {
-        setEditingjavito(
+        setEditingPartner(
           null
         );
 
-        setjavitoName(
+        setPartnerName(
           ""
         );
 
-        setjavitoAddress(
+        setPartnerAddress(
           ""
         );
 
-        setjavitoPhone(
+        setPartnerPhone(
           ""
         );
 
-        setjavitoEmail(
+        setPartnerEmail(
           ""
         );
       }, 250);
@@ -85,11 +105,36 @@ export default function MapScreen() {
 
 
   const [
-    selectedjavito,
-    setSelectedjavito,
+    selectedPartner,
+    setSelectedPartner,
   ] = useState<any>(
     null
   );
+
+  const [
+    partnerTaxNumber,
+    setPartnerTaxNumber,
+  ] =
+    useState("");
+
+  const [
+    partnerCustomerId,
+    setPartnerCustomerId,
+  ] =
+    useState("");
+
+  const [
+    partnerContact,
+    setPartnerContact,
+  ] =
+    useState("");
+
+  const [
+    selectedType,
+    setSelectedType,
+  ] = useState<
+    string | null
+  >(null);
 
   const [
     showProfileMenu,
@@ -97,35 +142,42 @@ export default function MapScreen() {
   ] = useState(false);
 
   const [
-    editingjavito,
-    setEditingjavito,
+    editingPartner,
+    setEditingPartner,
   ] = useState<any>(
     null
   );
 
   const [
-    showjavitoModal,
-    setShowjavitoModal,
+    showPartnerModal,
+    setShowPartnerModal,
   ] = useState(false);
 
   const [
-    javitoName,
-    setjavitoName,
+    partnerName,
+    setPartnerName,
   ] = useState("");
 
   const [
-    javitoAddress,
-    setjavitoAddress,
+    partnerAddress,
+    setPartnerAddress,
   ] = useState("");
 
   const [
-    javitoPhone,
-    setjavitoPhone,
+    partnerPhone,
+    setPartnerPhone,
   ] = useState("");
 
   const [
-    javitoEmail,
-    setjavitoEmail,
+    partnerType,
+    setPartnerType,
+  ] = useState(
+    "Független"
+  );
+
+  const [
+    partnerEmail,
+    setPartnerEmail,
   ] = useState("");
 
   const {
@@ -137,80 +189,109 @@ export default function MapScreen() {
     useAuthStore();
 
   const {
-    javitos,
-    fetchJavitos,
+    partners,
+    fetchPartners,
   } =
-    useJavitosStore();
+    usePartnersStore();
 
   useEffect(() => {
     checkSession();
-    fetchJavitos();
+    fetchPartners();
   }, []);
 
   const emailValid =
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-      javitoEmail
+      partnerEmail
     );
 
   const phoneValid =
     /^(\+36|06)?[\s-]?(20|30|31|50|70)[\s-]?\d{3}[\s-]?\d{4}$/.test(
-      javitoPhone.replace(
+      partnerPhone.replace(
         /\s/g,
         ""
       )
     );
 
-  const canSavejavito =
-    javitoName.trim() !==
+  const [
+    selectedCounty,
+    setSelectedCounty,
+  ] =
+    useState<
+      string | null
+    >(null);
+
+  const canSavePartner =
+    partnerName.trim() !==
     "" &&
-    javitoAddress.trim() !==
+    partnerAddress.trim() !==
     "" &&
     phoneValid &&
     emailValid;
 
-  const handleSavejavito =
+  const handleSavePartner =
     async () => {
       try {
         const endpoint =
-          editingjavito
-            ? "update-javito"
-            : "geocode-javito";
+          editingPartner
+            ? "update-partner"
+            : "geocode-partner";
 
         const body =
-          editingjavito
+          editingPartner
             ? {
               id:
-                editingjavito.id,
+                editingPartner.id,
 
               name:
-                javitoName,
+                partnerName,
 
               address:
-                javitoAddress,
+                partnerAddress,
 
               phone:
-                javitoPhone,
+                partnerPhone,
 
               email:
-                javitoEmail,
+                partnerEmail,
+
+              partner_type:
+                partnerType,
             }
             : {
               name:
-                javitoName,
+                partnerName,
 
               address:
-                javitoAddress,
+                partnerAddress,
 
               phone:
-                javitoPhone,
+                partnerPhone,
 
               email:
-                javitoEmail,
+                partnerEmail,
+
+              partner_type:
+                partnerType,
             };
+
+        console.log(
+          "SAVE BODY:",
+          body
+        );
+
+        console.log(
+          "ENDPOINT:",
+          endpoint
+        );
+
+        console.log(
+          "URL:",
+          `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/${endpoint}`
+        );
 
         const response =
           await fetch(
-            `https://nebgtkogsnvlvoveiaxv.supabase.co/functions/v1/${endpoint}`,
+            `https://nseopolqejpjftjutckn.supabase.co/functions/v1/${endpoint}`,
             {
               method:
                 "POST",
@@ -228,38 +309,48 @@ export default function MapScreen() {
             }
           );
 
-        const data =
+        const result =
           await response.json();
+
+        console.log(
+          "FUNCTION RESULT:",
+          result
+        );
+
+        console.log(
+          "STATUS:",
+          response.status
+        );
 
         if (
           !response.ok
         ) {
           throw new Error(
-            data.error ||
+            result.error ||
             "Mentés sikertelen"
           );
         }
 
         // reset
-        setjavitoName(
+        setPartnerName(
           ""
         );
 
-        setjavitoAddress(
+        setPartnerAddress(
           ""
         );
 
-        setjavitoPhone(
+        setPartnerPhone(
           ""
         );
 
-        setjavitoEmail(
+        setPartnerEmail(
           ""
         );
 
-        closejavitoModal();
+        closePartnerModal();
 
-        await fetchJavitos();
+        await fetchPartners();
       } catch (
       error
       ) {
@@ -269,21 +360,21 @@ export default function MapScreen() {
         );
 
         alert(
-          "Nem sikerült menteni a javitot."
+          "Nem sikerült menteni a javítót."
         );
       }
     };
 
-  const handleDeletejavito =
+  const handleDeletePartner =
     async () => {
       if (
-        !editingjavito
+        !editingPartner
       )
         return;
 
       const confirmed =
         confirm(
-          "Biztos törölni szeretnéd ezt a javitot?"
+          "Biztos törölni szeretnéd ezt a javítót?"
         );
 
       if (
@@ -291,10 +382,12 @@ export default function MapScreen() {
       )
         return;
 
+
+
       try {
         const response =
           await fetch(
-            "https://nebgtkogsnvlvoveiaxv.supabase.co/functions/v1/delete-javito",
+            "https://nseopolqejpjftjutckn.supabase.co/functions/v1/delete-partner",
             {
               method:
                 "POST",
@@ -308,7 +401,7 @@ export default function MapScreen() {
               body:
                 JSON.stringify({
                   id:
-                    editingjavito.id,
+                    editingPartner.id,
                 }),
             }
           );
@@ -324,13 +417,13 @@ export default function MapScreen() {
           );
         }
 
-        closejavitoModal();
+        closePartnerModal();
 
-        setSelectedjavito(
+        setSelectedPartner(
           null
         );
 
-        await fetchJavitos();
+        await fetchPartners();
       } catch (
       error
       ) {
@@ -343,6 +436,75 @@ export default function MapScreen() {
         );
       }
     };
+
+  const counties =
+    [
+      ...new Set(
+        partners
+          .map(
+            (p) =>
+              p.county
+          )
+          .filter(
+            (
+              county
+            ): county is string =>
+              !!county
+          )
+      ),
+    ].sort();
+
+  const filteredPartners =
+    partners.filter(
+      (partner) => {
+
+        const matchesType =
+          selectedType
+            ? partner.partner_type ===
+            selectedType
+            : true;
+
+        const matchesCounty =
+          selectedCounty
+            ? partner.county ===
+            selectedCounty
+            : true;
+
+        const query =
+          search.toLowerCase();
+
+        const matchesSearch =
+          partner.name
+            ?.toLowerCase()
+            .includes(
+              query
+            ) ||
+
+          partner.address
+            ?.toLowerCase()
+            .includes(
+              query
+            ) ||
+
+          partner.email
+            ?.toLowerCase()
+            .includes(
+              query
+            ) ||
+
+          partner.phone
+            ?.toLowerCase()
+            .includes(
+              query
+            );
+
+        return (
+          matchesType &&
+          matchesCounty &&
+          matchesSearch
+        );
+      }
+    );
 
   return (
     <View style={styles.container}>
@@ -357,7 +519,7 @@ export default function MapScreen() {
           >
             <Image
               source={require(
-                "../../../assets/dat-logo.jpg"
+                "../../../assets/dat-logo.png"
               )}
               style={styles.logo}
               resizeMode="contain"
@@ -370,26 +532,72 @@ export default function MapScreen() {
             styles.brandSubtitle
           }
         >
-          {javitos.length} javito
+          {
+            filteredPartners.length
+          }{" "}
+          javító
         </Text>
+
+        <View
+          style={
+            styles.searchContainer
+          }
+        >
+          <Text
+            style={
+              styles.searchIcon
+            }
+          >
+            🔍
+          </Text>
+
+          <TextInput
+            placeholder="Keresés javítóra..."
+            placeholderTextColor="#6F86B7"
+            value={search}
+            onChangeText={
+              setSearch
+            }
+            style={
+              styles.searchInput
+            }
+          />
+
+          {search.length >
+            0 && (
+              <TouchableOpacity
+                onPress={() =>
+                  setSearch("")
+                }
+              >
+                <Text
+                  style={
+                    styles.clearText
+                  }
+                >
+                  ✕
+                </Text>
+              </TouchableOpacity>
+            )}
+        </View>
 
         {/* header */}
         <View style={styles.listHeader}>
           <Text style={styles.listTitle}>
-            javitoek
+            Javítók
           </Text>
         </View>
 
-        {/* javito list */}
+        {/* partner list */}
+        {/* partner list */}
         <ScrollView
-          showsVerticalScrollIndicator={
-            false
-          }
+          showsVerticalScrollIndicator={false}
+          removeClippedSubviews={false}
           contentContainerStyle={{
             paddingBottom: 20,
           }}
         >
-          {[...javitos]
+          {[...filteredPartners]
             .sort((a, b) => {
               const zipA = parseInt(
                 a.address.match(/^\d+/)?.[0] || "0"
@@ -402,16 +610,16 @@ export default function MapScreen() {
               return zipA - zipB;
             })
             .map((
-              javito,
+              partner,
               index
             ) => (
               <TouchableOpacity
-                key={javito.id}
+                key={partner.id}
                 style={[
-                  styles.javitoRow,
+                  styles.partnerRow,
                   index % 2 === 0
-                    ? styles.javitoRowLight
-                    : styles.javitoRowDark,
+                    ? styles.partnerRowLight
+                    : styles.partnerRowDark,
                 ]}
                 activeOpacity={
                   0.85
@@ -419,78 +627,84 @@ export default function MapScreen() {
                 onPress={() => {
                   console.log(
                     "CLICKED:",
-                    javito.id
+                    partner.id
                   );
 
 
 
-                  setSelectedjavito(
-                    javito
+                  setSelectedPartner(
+                    partner
                   );
                 }}
 
                 onLongPress={() => {
                   if (
-                    !canEditjavitos(
+                    !canEditPartners(
                       role
                     )
                   )
                     return;
 
-                  setEditingjavito(
-                    javito
+                  setEditingPartner(
+                    partner
                   );
 
-                  setjavitoName(
-                    javito.name
+                  setPartnerName(
+                    partner.name
                   );
 
-                  setjavitoAddress(
-                    javito.address
+                  setPartnerAddress(
+                    partner.address
                   );
 
-                  setjavitoPhone(
-                    javito.phone ||
+                  setPartnerPhone(
+                    partner.phone ||
                     ""
                   );
 
-                  setjavitoEmail(
-                    javito.email ||
+                  setPartnerEmail(
+                    partner.email ||
                     ""
                   );
 
-                  setShowjavitoModal(
+                  setPartnerType(
+                    partner.partner_type ??
+                    "Független"
+                  );
+
+                  setShowPartnerModal(
                     true
                   );
                 }}
               >
                 <View
                   style={
-                    styles.javitoDot
+                    styles.partnerDot
                   }
                 />
 
                 <View
                   style={
-                    styles.javitoInfo
+                    styles.partnerInfo
                   }
                 >
                   <Text
                     style={
-                      styles.javitoName
+                      styles.partnerName
                     }
                     numberOfLines={1}
                   >
-                    {javito.name}
+                    {partner.name}
                   </Text>
 
                   <Text
                     style={
-                      styles.javitoCity
+                      styles.partnerCity
                     }
                     numberOfLines={1}
+                    ellipsizeMode="tail"
                   >
-                    {javito.address}
+                    {partner.address}
                   </Text>
                 </View>
 
@@ -536,7 +750,7 @@ export default function MapScreen() {
               <Text
                 style={styles.tabText}
               >
-                javitoek
+                Javítók
               </Text>
             </TouchableOpacity>
           </View>
@@ -628,7 +842,7 @@ export default function MapScreen() {
                       </View>
                     </TouchableOpacity>
 
-                    {canEditjavitos(
+                    {canEditPartners(
                       role
                     ) && (
                         <TouchableOpacity
@@ -639,28 +853,32 @@ export default function MapScreen() {
                             );
 
                             // reset edit mode
-                            setEditingjavito(
+                            setEditingPartner(
                               null
                             );
 
                             // reset form
-                            setjavitoName(
+                            setPartnerName(
                               ""
                             );
 
-                            setjavitoAddress(
+                            setPartnerAddress(
                               ""
                             );
 
-                            setjavitoPhone(
+                            setPartnerPhone(
                               ""
                             );
 
-                            setjavitoEmail(
+                            setPartnerEmail(
                               ""
                             );
 
-                            setShowjavitoModal(
+                            setPartnerType(
+                              "Független"
+                            );
+
+                            setShowPartnerModal(
                               true
                             );
                           }}
@@ -678,7 +896,7 @@ export default function MapScreen() {
                               style={styles.menuText}
                               numberOfLines={1}
                             >
-                              javito hozzáadása
+                              Javító hozzáadása
                             </Text>
                           </View>
                         </TouchableOpacity>
@@ -709,6 +927,196 @@ export default function MapScreen() {
           )}
         </View>
 
+        <View style={styles.filtersBar}>
+
+
+          <div
+            style={{
+              width: "100%",
+              cursor: "grab",
+            }}
+            onMouseDown={(e) => {
+              isDraggingRef.current =
+                true;
+
+              startXRef.current =
+                e.pageX;
+            }}
+            onMouseUp={() => {
+              isDraggingRef.current =
+                false;
+            }}
+            onMouseLeave={() => {
+              isDraggingRef.current =
+                false;
+            }}
+            onMouseMove={(e) => {
+              if (
+                !isDraggingRef.current
+              )
+                return;
+
+              const walk =
+                (startXRef.current -
+                  e.pageX) * 1.8;
+
+              countyScrollRef.current?.scrollTo({
+                x:
+                  scrollLeftRef.current +
+                  walk,
+                animated: false,
+              });
+            }}
+          >
+            <ScrollView
+              ref={countyScrollRef}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              scrollEventThrottle={16}
+              style={
+                Platform.OS === "web"
+                  ? ({
+                    cursor: "grab",
+                    userSelect: "none",
+                    WebkitUserSelect:
+                      "none",
+                  } as any)
+                  : undefined
+              }
+              onScroll={(e) => {
+                scrollLeftRef.current =
+                  e.nativeEvent.contentOffset.x;
+              }}
+              contentContainerStyle={{
+                gap: 10,
+                paddingRight: 20,
+                alignItems: "center",
+              }}
+            >
+              <TouchableOpacity
+                onPress={() =>
+                  setSelectedCounty(null)
+                }
+                style={[
+                  styles.filterChip,
+                  !selectedCounty &&
+                  styles.activeChip,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.filterChipText,
+                    !selectedCounty &&
+                    styles.activeChipText,
+                  ]}
+                >
+                  Összes
+                </Text>
+              </TouchableOpacity>
+
+              {counties.map((county) => (
+                <TouchableOpacity
+                  key={county}
+                  onPress={() =>
+                    setSelectedCounty(county)
+                  }
+                  style={[
+                    styles.filterChip,
+                    selectedCounty === county &&
+                    styles.activeChip,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.filterChipText,
+                      selectedCounty === county &&
+                      styles.activeChipText,
+                    ]}
+                  >
+                    {county}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </div>
+
+          <View style={styles.typeFilters}>
+            {[
+              "Független",
+              "Márkaszervíz",
+              "Értékelő",
+            ].map((type) => (
+              <TouchableOpacity
+                key={type}
+                onPress={() =>
+                  setSelectedType(
+                    selectedType === type
+                      ? null
+                      : type
+                  )
+                }
+                style={[
+                  styles.legendItem,
+
+                  type ===
+                  "Független" && {
+                    borderColor:
+                      "#63D471",
+                  },
+
+                  type ===
+                  "Márkaszervíz" && {
+                    borderColor:
+                      "#FFD400",
+                  },
+
+                  type ===
+                  "Értékelő" && {
+                    borderColor:
+                      "#FF5C8A",
+                  },
+
+                  selectedType ===
+                  type && {
+                    backgroundColor:
+                      type ===
+                        "Független"
+                        ? "#63D471"
+                        : type ===
+                          "Márkaszervíz"
+                          ? "#FFD400"
+                          : "#FF5C8A",
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.legendText,
+                    {
+                      color:
+                        type ===
+                          "Független"
+                          ? "#63D471"
+                          : type ===
+                            "Márkaszervíz"
+                            ? "#FFD400"
+                            : "#FF5C8A",
+                    },
+
+                    selectedType ===
+                    type && {
+                      color:
+                        "#09142B",
+                    },
+                  ]}
+                >
+                  {type}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
         {/* map */}
         <View
           style={
@@ -719,24 +1127,24 @@ export default function MapScreen() {
             "web" &&
             WebMapLeaflet ? (
             <WebMapLeaflet
-              javitos={
-                javitos
+              partners={
+                filteredPartners
               }
-              selectedjavito={
-                selectedjavito
+              selectedPartner={
+                selectedPartner
               }
             />
           ) : (
             <WebMap
-              selectedjavito={
-                selectedjavito
+              selectedPartner={
+                selectedPartner
               }
             />
           )}
         </View>
       </View >
       <Modal
-        visible={showjavitoModal}
+        visible={showPartnerModal}
         transparent
         animationType="fade"
       >
@@ -763,7 +1171,7 @@ export default function MapScreen() {
               >
                 <PlusCircle
                   size={28}
-                  color="#003B7A"
+                  color="#009DDF"
                 />
               </View>
 
@@ -777,9 +1185,9 @@ export default function MapScreen() {
                     styles.modalTitle
                   }
                 >
-                  {editingjavito
-                    ? "javito szerkesztése"
-                    : "Új javito"}
+                  {editingPartner
+                    ? "Javító szerkesztése"
+                    : "Új javító"}
                 </Text>
 
                 <Text
@@ -787,15 +1195,15 @@ export default function MapScreen() {
                     styles.modalSubtitle
                   }
                 >
-                  {editingjavito
-                    ? "javito adatok módosítása"
-                    : "javito hozzáadása automatikus geokódolással"}
+                  {editingPartner
+                    ? "Javító adatok módosítása"
+                    : "Javító hozzáadása automatikus geokódolással"}
                 </Text>
               </View>
 
               <TouchableOpacity
                 onPress={
-                  closejavitoModal
+                  closePartnerModal
                 }
                 style={
                   styles.closeButton
@@ -816,20 +1224,27 @@ export default function MapScreen() {
             >
               <Building2
                 size={18}
-                color="#003B7A"
+                color="#009DDF"
               />
 
               <TextInput
-                placeholder="javito neve"
+                placeholder="Javító neve"
                 placeholderTextColor="#94A3B8"
                 style={
                   styles.input
                 }
-                value={javitoName}
+                value={partnerName}
                 onChangeText={
-                  setjavitoName
+                  setPartnerName
                 }
               />
+              <Text
+                style={
+                  styles.inputLabel
+                }
+              >
+                Javító típusa
+              </Text>
             </View>
 
             {/* address */}
@@ -840,7 +1255,7 @@ export default function MapScreen() {
             >
               <MapPin
                 size={18}
-                color="#003B7A"
+                color="#009DDF"
               />
 
               <TextInput
@@ -850,10 +1265,10 @@ export default function MapScreen() {
                   styles.input
                 }
                 value={
-                  javitoAddress
+                  partnerAddress
                 }
                 onChangeText={
-                  setjavitoAddress
+                  setPartnerAddress
                 }
               />
             </View>
@@ -876,10 +1291,10 @@ export default function MapScreen() {
                   styles.input
                 }
                 value={
-                  javitoPhone
+                  partnerPhone
                 }
                 onChangeText={
-                  setjavitoPhone
+                  setPartnerPhone
                 }
               />
             </View>
@@ -902,14 +1317,14 @@ export default function MapScreen() {
                   styles.input
                 }
                 value={
-                  javitoEmail
+                  partnerEmail
                 }
                 onChangeText={
-                  setjavitoEmail
+                  setPartnerEmail
                 }
               />
 
-              {javitoEmail !==
+              {partnerEmail !==
                 "" &&
                 !emailValid && (
                   <Text
@@ -921,7 +1336,7 @@ export default function MapScreen() {
                   </Text>
                 )}
             </View>
-            {!canSavejavito && (
+            {!canSavePartner && (
               <Text
                 style={{
                   color: "#94A3B8",
@@ -934,13 +1349,95 @@ export default function MapScreen() {
               </Text>
             )}
 
-            {editingjavito && (
+            <Text
+              style={
+                styles.inputLabel
+              }
+            >
+              Javító típusa
+            </Text>
+
+            <View
+              style={
+                styles.typeSelector
+              }
+            >
+              {[
+                "Független",
+                "Márkaszervíz",
+                "Értékelő",
+              ].map((type) => (
+                <TouchableOpacity
+                  key={type}
+                  onPress={() =>
+                    setPartnerType(
+                      type
+                    )
+                  }
+                  style={[
+                    styles.typeButton,
+
+                    partnerType ===
+                    type &&
+                    styles.typeButtonActive,
+
+                    type ===
+                    "Független" && {
+                      borderColor:
+                        "#63D471",
+                    },
+
+                    type ===
+                    "Márkaszervíz" && {
+                      borderColor:
+                        "#FFD400",
+                    },
+
+                    type ===
+                    "Értékelő" && {
+                      borderColor:
+                        "#FF5C8A",
+                    },
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.typeDot,
+                      {
+                        backgroundColor:
+                          type ===
+                            "Független"
+                            ? "#63D471"
+                            : type ===
+                              "Márkaszervíz"
+                              ? "#FFD400"
+                              : "#FF5C8A",
+                      },
+                    ]}
+                  />
+
+                  <Text
+                    style={[
+                      styles.typeText,
+
+                      partnerType ===
+                      type &&
+                      styles.typeTextActive,
+                    ]}
+                  >
+                    {type}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {editingPartner && (
               <TouchableOpacity
                 style={
                   styles.deleteButton
                 }
                 onPress={
-                  handleDeletejavito
+                  handleDeletePartner
                 }
               >
                 <Text
@@ -948,7 +1445,7 @@ export default function MapScreen() {
                     styles.deleteText
                   }
                 >
-                  🗑 javito törlése
+                  🗑 Javító törlése
                 </Text>
               </TouchableOpacity>
             )}
@@ -964,7 +1461,7 @@ export default function MapScreen() {
                   styles.cancelButton
                 }
                 onPress={
-                  closejavitoModal
+                  closePartnerModal
                 }
               >
                 <Text
@@ -979,14 +1476,14 @@ export default function MapScreen() {
               <TouchableOpacity
                 style={[
                   styles.saveButton,
-                  !canSavejavito &&
+                  !canSavePartner &&
                   styles.saveButtonDisabled,
                 ]}
                 disabled={
-                  !canSavejavito
+                  !canSavePartner
                 }
                 onPress={
-                  handleSavejavito
+                  handleSavePartner
                 }
               >
                 <Text
@@ -994,9 +1491,9 @@ export default function MapScreen() {
                     styles.saveText
                   }
                 >
-                  {editingjavito
+                  {editingPartner
                     ? "Módosítás mentése"
-                    : "javito mentése"}
+                    : "Javító mentése"}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -1013,19 +1510,19 @@ const styles =
       flex: 1,
       flexDirection: "row",
       backgroundColor:
-        "#F5F7FA",
+        "#071021",
     },
 
     sidebar: {
-      width: 310,
-      backgroundColor:
-        "#FFFFFF",
+      width: 340,
+      backgroundColor: "#09142B",
       paddingHorizontal: 20,
       paddingTop: 20,
       paddingBottom: 20,
       borderRightWidth: 1,
-      borderRightColor:
-        "#ECEFF3",
+      borderRightColor: "#16284E",
+
+      display: "flex",
     },
 
     brandSection: {
@@ -1039,7 +1536,7 @@ const styles =
       height: 12,
       borderRadius: 999,
       backgroundColor:
-        "#003B7A",
+        "#009DDF",
       marginRight: 12,
     },
 
@@ -1050,9 +1547,15 @@ const styles =
     },
 
     brandSubtitle: {
-      color: "#64748B",
-      marginTop: 2,
+      color: "#8AA2D3",
+
+      marginTop: 4,
+
       fontSize: 14,
+
+      textAlign: "center",
+
+      fontWeight: "600",
     },
 
     listHeader: {
@@ -1060,33 +1563,40 @@ const styles =
     },
 
     listTitle: {
-      fontSize: 13,
-      fontWeight: "700",
-      color: "#94A3B8",
+      fontSize: 12,
+
+      fontWeight: "800",
+
+      color: "#FFD400",
+
       textTransform:
         "uppercase",
-      letterSpacing: 1,
+
+      letterSpacing: 1.2,
     },
 
-    javitoRow: {
+    partnerRow: {
       flexDirection: "row",
       alignItems: "center",
       paddingVertical: 16,
       paddingHorizontal: 16,
-      borderRadius: 20,
+      borderRadius: 24,
       marginBottom: 12,
+      padding: 18,
 
+
+      overflow: "hidden",
       backgroundColor:
-        "#FFFFFF",
+        "#112043",
 
-      borderWidth: 1.2,
+      borderWidth: 1,
       borderColor:
-        "#E8EEF5",
+        "#203A6E",
 
       shadowColor:
-        "#003B7A",
+        "#0F172A",
       shadowOpacity:
-        0.04,
+        0.18,
       shadowRadius: 12,
       shadowOffset: {
         width: 0,
@@ -1096,35 +1606,51 @@ const styles =
       elevation: 2,
     },
 
-    javitoDot: {
+    partnerDot: {
       width: 10,
       height: 10,
       borderRadius: 999,
       backgroundColor:
-        "#003B7A",
+        "#009DDF",
       marginRight: 14,
     },
 
-    javitoInfo: {
+    partnerInfo: {
       flex: 1,
+
+      minWidth: 0,
     },
 
-    javitoName: {
+    partnerName: {
       fontSize: 15,
-      fontWeight: "600",
-      color: "#111827",
+
+      fontWeight: "700",
+
+      color: "#FFFFFF",
+
+      lineHeight: 22,
+
+      paddingRight: 12,
     },
 
-    javitoCity: {
-      color: "#64748B",
-      marginTop: 2,
+    partnerCity: {
+      color: "#AFC0E0",
+
+      marginTop: 4,
+
       fontSize: 13,
+
+      lineHeight: 20,
+
+      paddingRight: 18,
     },
 
     arrow: {
-      color: "#94A3B8",
-      fontSize: 18,
-      fontWeight: "600",
+      color: "#FFD400",
+
+      fontSize: 20,
+
+      fontWeight: "800",
     },
 
     main: {
@@ -1137,17 +1663,27 @@ const styles =
 
     topbar: {
       height: 58,
+
       backgroundColor:
-        "#FFFFFF",
-      borderRadius: 18,
+        "#0B1633",
+
+      borderRadius: 20,
+
       paddingHorizontal: 18,
+
       marginBottom: 14,
+
       flexDirection: "row",
+
       alignItems: "center",
+
       justifyContent:
         "space-between",
+
       borderWidth: 1,
-      borderColor: "#EEF2F6",
+
+      borderColor:
+        "#203A6E",
       zIndex: 9999,
     },
 
@@ -1159,19 +1695,22 @@ const styles =
 
     activeTab: {
       backgroundColor:
-        "#003B7A",
+        "#FFD400",
+
       borderRadius: 12,
-      paddingHorizontal: 16,
+
+      paddingHorizontal: 18,
+
       paddingVertical: 8,
     },
 
     activeTabText: {
-      color: "#FFFFFF",
+      color: "#09142B",
       fontWeight: "600",
     },
 
     tabText: {
-      color: "#64748B",
+      color: "#B9C8E6",
       fontWeight: "500",
     },
 
@@ -1206,20 +1745,21 @@ const styles =
       borderRadius: 20,
       overflow: "hidden",
       backgroundColor:
-        "#EAF2F8",
+        "#081224",
       zIndex: 1,
     },
 
-    javitoRowLight: {
+    partnerRowLight: {
       backgroundColor:
-        "#FFFFFF",
+        "#112043",
     },
 
-    javitoRowDark: {
+    partnerRowDark: {
       backgroundColor:
-        "#FFFDF3",
+        "#0D1B3A",
+
       borderColor:
-        "#DCE8F5",
+        "#203A6E",
     },
     logoContainer: {
       width: "100%",
@@ -1236,7 +1776,7 @@ const styles =
 
     loginButton: {
       backgroundColor:
-        "#111827",
+        "#FFD400",
 
       paddingHorizontal:
         18,
@@ -1253,14 +1793,14 @@ const styles =
     },
 
     loginText: {
-      color: "#FFF",
+      color: "#09142B",
       fontWeight: "700",
       fontSize: 14,
     },
 
     profileButton: {
       backgroundColor:
-        "#003B7A",
+        "#0F172A",
 
       height: 42,
 
@@ -1383,7 +1923,7 @@ const styles =
         "#EEF2F7",
 
       shadowColor:
-        "#003B7A",
+        "#0F172A",
 
       shadowOpacity:
         0.14,
@@ -1400,7 +1940,7 @@ const styles =
     modalTitle: {
       fontSize: 26,
       fontWeight: "800",
-      color: "#003B7A",
+      color: "#0F172A",
     },
 
     input: {
@@ -1408,7 +1948,7 @@ const styles =
       height: "100%",
       marginLeft: 14,
       fontSize: 15,
-      color: "#003B7A",
+      color: "#0F172A",
     },
 
     saveButton: {
@@ -1419,7 +1959,7 @@ const styles =
       borderRadius: 18,
 
       backgroundColor:
-        "#003B7A",
+        "#009DDF",
 
       justifyContent:
         "center",
@@ -1428,7 +1968,7 @@ const styles =
         "center",
 
       shadowColor:
-        "#003B7A",
+        "#009DDF",
 
       shadowOpacity:
         0.28,
@@ -1548,7 +2088,7 @@ const styles =
       borderRadius: 22,
 
       backgroundColor:
-        "#FFF8CC",
+        "#E0F2FE",
 
       justifyContent:
         "center",
@@ -1619,16 +2159,291 @@ const styles =
     },
 
     validationError: {
-      color: "#DC2626",
+      color: "#ef4444",
 
-      fontSize: 12,
+      fontSize: 13,
+
+      marginTop: 6,
+
+      marginBottom: 8,
+
+      marginLeft: 4,
+
+      fontWeight: "500",
+    },
+
+    legendCard: {
+      marginTop: 20,
+
+      backgroundColor:
+        "#0B1633",
+
+      borderRadius: 24,
+
+      paddingVertical: 18,
+
+      paddingHorizontal: 20,
+
+      borderWidth: 1,
+
+      gap: 8,
+
+      width: "100%",
+
+      borderColor:
+        "#1A376B",
+    },
+
+    legendTitle: {
+      color: "#FFD400",
+      fontSize: 13,
+      fontWeight: "800",
+      marginBottom: 12,
+      letterSpacing: 1.2,
+    },
+
+    legendItem: {
+      height: 42,
+      borderRadius: 14,
+      paddingHorizontal: 14,
+      backgroundColor:
+        "#112043",
+
+      justifyContent:
+        "center",
+
+      borderWidth: 2,
+    },
+
+    legendItemActive: {
+      transform: [
+        {
+          scale: 1.02,
+        },
+      ],
+    },
+
+    legendText: {
+      fontWeight: "700",
+      fontSize: 15,
+    },
+
+    pickerContainer: {
+      borderWidth: 1,
+
+      borderColor:
+        "#223B73",
+
+      backgroundColor:
+        "#112043",
+
+      borderRadius: 14,
+
+      overflow:
+        "hidden",
+
+      marginBottom: 16,
+    },
+
+    picker: {
+      color: "#FFFFFF",
+
+      height: 54,
+    },
+
+    inputLabel: {
+      color: "#FFFFFF",
+
+      fontSize: 14,
 
       fontWeight: "600",
 
-      marginTop: -8,
+      marginBottom: 8,
+
+      marginTop: 10,
+    },
+
+    typeSelector: {
+      gap: 10,
+
+      marginBottom: 20,
+    },
+
+    typeButton: {
+      height: 56,
+
+      borderRadius: 18,
+
+      borderWidth: 2,
+
+      backgroundColor:
+        "#F8FAFC",
+
+      paddingHorizontal: 18,
+
+      flexDirection: "row",
+
+      alignItems: "center",
+    },
+
+    typeButtonActive: {
+      backgroundColor:
+        "#EEF5FF",
+    },
+
+    typeDot: {
+      width: 14,
+
+      height: 14,
+
+      borderRadius: 999,
+
+      marginRight: 14,
+    },
+
+    typeText: {
+      fontSize: 15,
+
+      fontWeight: "600",
+
+      color: "#1E293B",
+    },
+
+    typeTextActive: {
+      fontWeight: "700",
+    },
+
+    searchContainer: {
+      height: 50,
+
+      borderRadius: 18,
+
+      backgroundColor:
+        "#101F42",
+
+      borderWidth: 1,
+
+      borderColor:
+        "#203A6E",
+
+      flexDirection:
+        "row",
+
+      alignItems:
+        "center",
+
+      paddingHorizontal:
+        16,
+
+      marginTop: 18,
+
+      marginBottom: 18,
+    },
+
+    searchInput: {
+      flex: 1,
+
+      color: "#FFFFFF",
+
+      fontSize: 14,
+
+      fontWeight: "500",
+    },
+
+    searchIcon: {
+      fontSize: 16,
+
+      marginRight: 10,
+    },
+
+    clearText: {
+      color: "#7A93C7",
+
+      fontSize: 18,
+
+      fontWeight: "700",
+    },
+
+    filterTitle: {
+      color: "#FFD400",
+
+      fontSize: 15,
+
+      fontWeight: "800",
 
       marginBottom: 12,
 
-      marginLeft: 4,
+      letterSpacing: 1,
+    },
+
+    filterRow: {
+      marginBottom: 24,
+    },
+
+
+    chipsContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 10,
+      marginBottom: 24,
+    },
+
+    filterChip: {
+      height: 38,
+      backgroundColor: "#0F1C37",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.08)",
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+
+    activeChip: {
+      backgroundColor:
+        "#FFD400",
+
+      borderColor:
+        "#FFD400",
+    },
+
+    filterChipText: {
+      color: "#AFC0E0",
+
+      fontWeight:
+        "600",
+
+      fontSize:
+        13,
+    },
+
+    activeChipText: {
+      color: "#09142B",
+
+      fontWeight:
+        "700",
+    },
+
+    filtersBar: {
+      backgroundColor: "#0B1633",
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: "#203A6E",
+      paddingVertical: 14,
+      paddingHorizontal: 18,
+      marginBottom: 14,
+
+      gap: 14,
+    },
+
+    typeFilters: {
+      flexDirection: "row",
+      gap: 12,
+      flexWrap: "wrap",
+      marginTop: 4,
+    },
+
+    countyScroller: {
+      width: "100%",
     },
   });
