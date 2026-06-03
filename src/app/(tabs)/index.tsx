@@ -9,6 +9,7 @@ import {
   View
 } from "react-native";
 
+
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 
@@ -100,6 +101,22 @@ export default function MapScreen() {
         setPartnerEmail(
           ""
         );
+
+        setPartnerTaxNumber(
+          ""
+        );
+
+        setPartnerCustomerId(
+          ""
+        );
+
+        setPartnerContact(
+          ""
+        );
+
+        setPartnerCounty(
+          ""
+        );
       }, 250);
     };
 
@@ -126,6 +143,12 @@ export default function MapScreen() {
   const [
     partnerContact,
     setPartnerContact,
+  ] =
+    useState("");
+
+  const [
+    partnerCounty,
+    setPartnerCounty,
   ] =
     useState("");
 
@@ -256,6 +279,18 @@ export default function MapScreen() {
 
               partner_type:
                 partnerType,
+
+              tax_number:
+                partnerTaxNumber,
+
+              customer_id:
+                partnerCustomerId,
+
+              contact:
+                partnerContact,
+
+              county:
+                partnerCounty,
             }
             : {
               name:
@@ -272,6 +307,18 @@ export default function MapScreen() {
 
               partner_type:
                 partnerType,
+
+              tax_number:
+                partnerTaxNumber,
+
+              customer_id:
+                partnerCustomerId,
+
+              contact:
+                partnerContact,
+
+              county:
+                partnerCounty,
             };
 
         console.log(
@@ -664,6 +711,26 @@ export default function MapScreen() {
 
                   setPartnerEmail(
                     partner.email ||
+                    ""
+                  );
+
+                  setPartnerTaxNumber(
+                    partner.tax_number ||
+                    ""
+                  );
+
+                  setPartnerCustomerId(
+                    partner.customer_id ||
+                    ""
+                  );
+
+                  setPartnerContact(
+                    partner.contact ||
+                    ""
+                  );
+
+                  setPartnerCounty(
+                    partner.county ||
                     ""
                   );
 
@@ -1158,86 +1225,310 @@ export default function MapScreen() {
               styles.modalCard
             }
           >
-            {/* header */}
-            <View
-              style={
-                styles.modalHeader
-              }
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingBottom: 20,
+              }}
             >
+              {/* header */}
               <View
                 style={
-                  styles.modalIcon
+                  styles.modalHeader
                 }
               >
-                <PlusCircle
-                  size={28}
+                <View
+                  style={
+                    styles.modalIcon
+                  }
+                >
+                  <PlusCircle
+                    size={28}
+                    color="#009DDF"
+                  />
+                </View>
+
+                <View
+                  style={{
+                    flex: 1,
+                  }}
+                >
+                  <Text
+                    style={
+                      styles.modalTitle
+                    }
+                  >
+                    {editingPartner
+                      ? "Javító szerkesztése"
+                      : "Új javító"}
+                  </Text>
+
+                  <Text
+                    style={
+                      styles.modalSubtitle
+                    }
+                  >
+                    {editingPartner
+                      ? "Javító adatok módosítása"
+                      : "Javító hozzáadása automatikus geokódolással"}
+                  </Text>
+                </View>
+
+                <TouchableOpacity
+                  onPress={
+                    closePartnerModal
+                  }
+                  style={
+                    styles.closeButton
+                  }
+                >
+                  <X
+                    size={20}
+                    color="#64748B"
+                  />
+                </TouchableOpacity>
+              </View>
+
+              {/* name */}
+              <View
+                style={
+                  styles.inputWrap
+                }
+              >
+                <Building2
+                  size={18}
                   color="#009DDF"
                 />
-              </View>
 
-              <View
-                style={{
-                  flex: 1,
-                }}
-              >
-                <Text
+                <TextInput
+                  placeholder="Javító neve"
+                  placeholderTextColor="#94A3B8"
                   style={
-                    styles.modalTitle
+                    styles.input
                   }
-                >
-                  {editingPartner
-                    ? "Javító szerkesztése"
-                    : "Új javító"}
-                </Text>
-
-                <Text
-                  style={
-                    styles.modalSubtitle
+                  value={partnerName}
+                  onChangeText={
+                    setPartnerName
                   }
-                >
-                  {editingPartner
-                    ? "Javító adatok módosítása"
-                    : "Javító hozzáadása automatikus geokódolással"}
-                </Text>
-              </View>
-
-              <TouchableOpacity
-                onPress={
-                  closePartnerModal
-                }
-                style={
-                  styles.closeButton
-                }
-              >
-                <X
-                  size={20}
-                  color="#64748B"
                 />
-              </TouchableOpacity>
-            </View>
+              </View>
 
-            {/* name */}
-            <View
-              style={
-                styles.inputWrap
-              }
-            >
-              <Building2
-                size={18}
-                color="#009DDF"
-              />
-
-              <TextInput
-                placeholder="Javító neve"
-                placeholderTextColor="#94A3B8"
+              {/* address */}
+              <View
                 style={
-                  styles.input
+                  styles.inputWrap
                 }
-                value={partnerName}
-                onChangeText={
-                  setPartnerName
+              >
+                <MapPin
+                  size={18}
+                  color="#009DDF"
+                />
+
+                <TextInput
+                  placeholder="Cím"
+                  placeholderTextColor="#94A3B8"
+                  style={
+                    styles.input
+                  }
+                  value={
+                    partnerAddress
+                  }
+                  onChangeText={
+                    setPartnerAddress
+                  }
+                />
+              </View>
+
+              {/* phone */}
+              <View
+                style={
+                  styles.inputWrap
                 }
-              />
+              >
+                <Phone
+                  size={18}
+                  color="#EC4899"
+                />
+
+                <TextInput
+                  placeholder="Telefonszám"
+                  placeholderTextColor="#94A3B8"
+                  style={
+                    styles.input
+                  }
+                  value={
+                    partnerPhone
+                  }
+                  onChangeText={
+                    setPartnerPhone
+                  }
+                />
+              </View>
+
+              {/* email */}
+              <View
+                style={
+                  styles.inputWrap
+                }
+              >
+                <Mail
+                  size={18}
+                  color="#8B5CF6"
+                />
+
+                <TextInput
+                  placeholder="Email"
+                  placeholderTextColor="#94A3B8"
+                  style={
+                    styles.input
+                  }
+                  value={
+                    partnerEmail
+                  }
+                  onChangeText={
+                    setPartnerEmail
+                  }
+                />
+
+                {partnerEmail !==
+                  "" &&
+                  !emailValid && (
+                    <Text
+                      style={
+                        styles.validationError
+                      }
+                    >
+                      Hibás email formátum
+                    </Text>
+                  )}
+              </View>
+
+              <View style={styles.formGrid}>
+                <View style={styles.formCol}>
+                  {/* kapcsolattartó */}
+                  <View style={styles.inputWrap}>
+                    <View
+                      {...(Platform.OS === "web"
+                        ? {
+                          title:
+                            "Kapcsolattartó neve",
+                        }
+                        : {})}
+                    >
+                      <User
+                        size={18}
+                        color="#FFD400"
+                      />
+                    </View>
+
+                    <TextInput
+                      placeholder="Kapcsolattartó"
+                      placeholderTextColor="#94A3B8"
+                      style={styles.input}
+                      value={partnerContact}
+                      onChangeText={
+                        setPartnerContact
+                      }
+                    />
+                  </View>
+
+                  {/* ügyfélszám */}
+                  <View style={styles.inputWrap}>
+                    <View
+                      {...(Platform.OS === "web"
+                        ? {
+                          title:
+                            "DAT ügyfélszám",
+                        }
+                        : {})}
+                    >
+                      <Building2
+                        size={18}
+                        color="#63D471"
+                      />
+                    </View>
+
+                    <TextInput
+                      placeholder="Ügyfélszám"
+                      placeholderTextColor="#94A3B8"
+                      style={styles.input}
+                      value={partnerCustomerId}
+                      onChangeText={
+                        setPartnerCustomerId
+                      }
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.formCol}>
+                  {/* adószám */}
+                  <View style={styles.inputWrap}>
+                    <View
+                      {...(Platform.OS === "web"
+                        ? {
+                          title:
+                            "Cég adószáma (pl. 12345678-2-41)",
+                        }
+                        : {})}
+                    >
+                      <Building2
+                        size={18}
+                        color="#FF5C8A"
+                      />
+                    </View>
+
+                    <TextInput
+                      placeholder="Adószám"
+                      placeholderTextColor="#94A3B8"
+                      style={styles.input}
+                      value={partnerTaxNumber}
+                      onChangeText={
+                        setPartnerTaxNumber
+                      }
+                    />
+                  </View>
+
+                  {/* megye */}
+                  <View style={styles.inputWrap}>
+                    <View
+                      {...(Platform.OS === "web"
+                        ? {
+                          title:
+                            "Partner megyéje (pl. Pest)",
+                        }
+                        : {})}
+                    >
+                      <MapPin
+                        size={18}
+                        color="#009DDF"
+                      />
+                    </View>
+
+                    <TextInput
+                      placeholder="Megye"
+                      placeholderTextColor="#94A3B8"
+                      style={styles.input}
+                      value={partnerCounty}
+                      onChangeText={
+                        setPartnerCounty
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
+              {!canSavePartner && (
+                <Text
+                  style={{
+                    color: "#94A3B8",
+                    marginTop: 6,
+                    fontSize: 13,
+                    textAlign: "center",
+                  }}
+                >
+                  Minden mező kitöltése kötelező!
+                </Text>
+              )}
+
               <Text
                 style={
                   styles.inputLabel
@@ -1245,258 +1536,175 @@ export default function MapScreen() {
               >
                 Javító típusa
               </Text>
-            </View>
 
-            {/* address */}
-            <View
-              style={
-                styles.inputWrap
-              }
-            >
-              <MapPin
-                size={18}
-                color="#009DDF"
-              />
-
-              <TextInput
-                placeholder="Cím"
-                placeholderTextColor="#94A3B8"
+              <View
                 style={
-                  styles.input
+                  styles.typeSelector
                 }
-                value={
-                  partnerAddress
-                }
-                onChangeText={
-                  setPartnerAddress
-                }
-              />
-            </View>
-
-            {/* phone */}
-            <View
-              style={
-                styles.inputWrap
-              }
-            >
-              <Phone
-                size={18}
-                color="#EC4899"
-              />
-
-              <TextInput
-                placeholder="Telefonszám"
-                placeholderTextColor="#94A3B8"
-                style={
-                  styles.input
-                }
-                value={
-                  partnerPhone
-                }
-                onChangeText={
-                  setPartnerPhone
-                }
-              />
-            </View>
-
-            {/* email */}
-            <View
-              style={
-                styles.inputWrap
-              }
-            >
-              <Mail
-                size={18}
-                color="#8B5CF6"
-              />
-
-              <TextInput
-                placeholder="Email"
-                placeholderTextColor="#94A3B8"
-                style={
-                  styles.input
-                }
-                value={
-                  partnerEmail
-                }
-                onChangeText={
-                  setPartnerEmail
-                }
-              />
-
-              {partnerEmail !==
-                "" &&
-                !emailValid && (
-                  <Text
-                    style={
-                      styles.validationError
-                    }
-                  >
-                    Hibás email formátum
-                  </Text>
-                )}
-            </View>
-            {!canSavePartner && (
-              <Text
-                style={{
-                  color: "#94A3B8",
-                  marginTop: 6,
-                  fontSize: 13,
-                  textAlign: "center",
-                }}
               >
-                Minden mező kitöltése kötelező!
-              </Text>
-            )}
-
-            <Text
-              style={
-                styles.inputLabel
-              }
-            >
-              Javító típusa
-            </Text>
-
-            <View
-              style={
-                styles.typeSelector
-              }
-            >
-              {[
-                "Független",
-                "Márkaszervíz",
-                "Értékelő",
-              ].map((type) => (
-                <TouchableOpacity
-                  key={type}
-                  onPress={() =>
-                    setPartnerType(
-                      type
-                    )
-                  }
-                  style={[
-                    styles.typeButton,
-
-                    partnerType ===
-                    type &&
-                    styles.typeButtonActive,
-
-                    type ===
-                    "Független" && {
-                      borderColor:
-                        "#63D471",
-                    },
-
-                    type ===
-                    "Márkaszervíz" && {
-                      borderColor:
-                        "#FFD400",
-                    },
-
-                    type ===
-                    "Értékelő" && {
-                      borderColor:
-                        "#FF5C8A",
-                    },
-                  ]}
-                >
-                  <View
+                {[
+                  "Független",
+                  "Márkaszervíz",
+                  "Értékelő",
+                ].map((type) => (
+                  <TouchableOpacity
+                    key={type}
+                    onPress={() =>
+                      setPartnerType(
+                        type
+                      )
+                    }
                     style={[
-                      styles.typeDot,
-                      {
-                        backgroundColor:
-                          type ===
-                            "Független"
-                            ? "#63D471"
-                            : type ===
-                              "Márkaszervíz"
-                              ? "#FFD400"
-                              : "#FF5C8A",
-                      },
-                    ]}
-                  />
-
-                  <Text
-                    style={[
-                      styles.typeText,
+                      styles.typeButton,
 
                       partnerType ===
                       type &&
-                      styles.typeTextActive,
+                      styles.typeButtonActive,
+
+                      partnerType === type &&
+                      type === "Független" && {
+                        backgroundColor:
+                          "rgba(99,212,113,0.10)",
+
+                        borderColor:
+                          "#63D471",
+                      },
+
+                      partnerType === type &&
+                      type === "Márkaszervíz" && {
+                        backgroundColor:
+                          "rgba(255,212,0,0.10)",
+
+                        borderColor:
+                          "#FFD400",
+                      },
+
+                      partnerType === type &&
+                      type === "Értékelő" && {
+                        backgroundColor:
+                          "rgba(255,92,138,0.10)",
+
+                        borderColor:
+                          "#FF5C8A",
+                      },
+
+                      type ===
+                      "Független" && {
+                        borderColor:
+                          "#63D471",
+                      },
+
+                      type ===
+                      "Márkaszervíz" && {
+                        borderColor:
+                          "#FFD400",
+                      },
+
+                      type ===
+                      "Értékelő" && {
+                        borderColor:
+                          "#FF5C8A",
+                      },
                     ]}
                   >
-                    {type}
+                    <View
+                      style={[
+                        styles.typeDot,
+                        {
+                          backgroundColor:
+                            type ===
+                              "Független"
+                              ? "#63D471"
+                              : type ===
+                                "Márkaszervíz"
+                                ? "#FFD400"
+                                : "#FF5C8A",
+                        },
+                      ]}
+                    />
+
+                    <Text
+                      style={[
+                        styles.typeText,
+
+                        partnerType ===
+                        type &&
+                        styles.typeTextActive,
+                      ]}
+                    >
+                      {type}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {editingPartner && (
+                <TouchableOpacity
+                  style={
+                    styles.deleteButton
+                  }
+                  onPress={
+                    handleDeletePartner
+                  }
+                >
+                  <Text
+                    style={
+                      styles.deleteText
+                    }
+                  >
+                    🗑 Javító törlése
                   </Text>
                 </TouchableOpacity>
-              ))}
-            </View>
+              )}
 
-            {editingPartner && (
-              <TouchableOpacity
+              {/* footer */}
+              <View
                 style={
-                  styles.deleteButton
-                }
-                onPress={
-                  handleDeletePartner
+                  styles.modalFooter
                 }
               >
-                <Text
+                <TouchableOpacity
                   style={
-                    styles.deleteText
+                    styles.cancelButton
+                  }
+                  onPress={
+                    closePartnerModal
                   }
                 >
-                  🗑 Javító törlése
-                </Text>
-              </TouchableOpacity>
-            )}
+                  <Text
+                    style={
+                      styles.cancelText
+                    }
+                  >
+                    Mégse
+                  </Text>
+                </TouchableOpacity>
 
-            {/* footer */}
-            <View
-              style={
-                styles.modalFooter
-              }
-            >
-              <TouchableOpacity
-                style={
-                  styles.cancelButton
-                }
-                onPress={
-                  closePartnerModal
-                }
-              >
-                <Text
-                  style={
-                    styles.cancelText
+                <TouchableOpacity
+                  style={[
+                    styles.saveButton,
+                    !canSavePartner &&
+                    styles.saveButtonDisabled,
+                  ]}
+                  disabled={
+                    !canSavePartner
+                  }
+                  onPress={
+                    handleSavePartner
                   }
                 >
-                  Mégse
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.saveButton,
-                  !canSavePartner &&
-                  styles.saveButtonDisabled,
-                ]}
-                disabled={
-                  !canSavePartner
-                }
-                onPress={
-                  handleSavePartner
-                }
-              >
-                <Text
-                  style={
-                    styles.saveText
-                  }
-                >
-                  {editingPartner
-                    ? "Módosítás mentése"
-                    : "Javító mentése"}
-                </Text>
-              </TouchableOpacity>
-            </View>
+                  <Text
+                    style={
+                      styles.saveText
+                    }
+                  >
+                    {editingPartner
+                      ? "Módosítás mentése"
+                      : "Javító mentése"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -1584,26 +1792,11 @@ const styles =
       marginBottom: 12,
       padding: 18,
 
-
       overflow: "hidden",
-      backgroundColor:
-        "#112043",
+      backgroundColor: "#112043",
 
       borderWidth: 1,
-      borderColor:
-        "#203A6E",
-
-      shadowColor:
-        "#0F172A",
-      shadowOpacity:
-        0.18,
-      shadowRadius: 12,
-      shadowOffset: {
-        width: 0,
-        height: 4,
-      },
-
-      elevation: 2,
+      borderColor: "#203A6E",
     },
 
     partnerDot: {
@@ -1896,90 +2089,63 @@ const styles =
     modalOverlay: {
       flex: 1,
       backgroundColor:
-        "rgba(15,23,42,0.55)",
+        "rgba(7,16,33,0.82)",
 
       justifyContent:
         "center",
 
       alignItems:
         "center",
-
-      backdropFilter:
-        "blur(14px)",
     },
 
     modalCard: {
-      width: 620,
+      width: 760,
+      maxHeight: "88%",
 
       backgroundColor:
-        "#FFFFFF",
+        "#071021",
 
       borderRadius: 34,
 
-      padding: 28,
-
       borderWidth: 1,
       borderColor:
-        "#EEF2F7",
+        "#1B3564",
 
-      shadowColor:
-        "#0F172A",
+      padding: 36,
 
-      shadowOpacity:
-        0.14,
-
-      shadowRadius:
-        50,
-
-      shadowOffset: {
-        width: 0,
-        height: 24,
-      },
+      shadowOpacity: 0,
+      elevation: 0,
     },
 
     modalTitle: {
-      fontSize: 26,
-      fontWeight: "800",
-      color: "#0F172A",
+      fontSize: 30,
+      fontWeight: "900",
+      color: "#FFFFFF",
+      letterSpacing: -1.4,
     },
 
     input: {
       flex: 1,
-      height: "100%",
-      marginLeft: 14,
-      fontSize: 15,
-      color: "#0F172A",
+
+      color: "#FFFFFF",
+
+      fontSize: 16,
+      fontWeight: "600",
     },
 
     saveButton: {
       flex: 1,
-
       height: 58,
-
       borderRadius: 18,
 
       backgroundColor:
-        "#009DDF",
+        "#FFD400",
 
       justifyContent:
         "center",
 
       alignItems:
         "center",
-
-      shadowColor:
-        "#009DDF",
-
-      shadowOpacity:
-        0.28,
-
-      shadowRadius:
-        24,
-
-      shadowOffset: {
-        width: 0,
-        height: 12,
-      },
     },
 
     menuRow: {
@@ -2027,7 +2193,12 @@ const styles =
       borderRadius: 18,
 
       backgroundColor:
-        "#F1F5F9",
+        "#102041",
+
+      borderWidth: 1,
+
+      borderColor:
+        "#203A6E",
 
       justifyContent:
         "center",
@@ -2037,18 +2208,17 @@ const styles =
     },
 
     inputWrap: {
-      height: 62,
+      height: 64,
 
-      borderRadius: 18,
+      borderRadius: 24,
 
       backgroundColor:
-        "#F8FAFC",
+        "#102041",
 
-      borderWidth: 1,
+      borderWidth: 1.5,
+
       borderColor:
-        "#E2E8F0",
-
-      paddingHorizontal: 18,
+        "#203A6E",
 
       flexDirection:
         "row",
@@ -2056,13 +2226,18 @@ const styles =
       alignItems:
         "center",
 
-      marginBottom: 14,
+      paddingHorizontal:
+        22,
+
+      gap: 16,
+
+      marginBottom: 16,
     },
 
     modalSubtitle: {
-      color: "#64748B",
-      marginTop: 4,
-      lineHeight: 20,
+      color: "#7D91B8",
+      fontSize: 15,
+      marginTop: 6,
     },
 
     closeButton: {
@@ -2079,6 +2254,26 @@ const styles =
 
       alignItems:
         "center",
+    },
+
+    modalIconWrap: {
+      width: 72,
+      height: 72,
+
+      borderRadius: 28,
+
+      backgroundColor:
+        "#102041",
+
+      justifyContent:
+        "center",
+
+      alignItems:
+        "center",
+
+      borderWidth: 1,
+      borderColor:
+        "#203A6E",
     },
 
     modalIcon: {
@@ -2274,21 +2469,24 @@ const styles =
 
       borderRadius: 18,
 
+      backgroundColor:
+        "#102041",
+
       borderWidth: 2,
 
-      backgroundColor:
-        "#F8FAFC",
+      justifyContent:
+        "center",
 
-      paddingHorizontal: 18,
+      paddingHorizontal:
+        18,
 
-      flexDirection: "row",
-
-      alignItems: "center",
+      marginBottom: 16,
+      overflow: "hidden",
     },
 
     typeButtonActive: {
       backgroundColor:
-        "#EEF5FF",
+        "#16284E",
     },
 
     typeDot: {
@@ -2302,15 +2500,14 @@ const styles =
     },
 
     typeText: {
-      fontSize: 15,
-
-      fontWeight: "600",
-
-      color: "#1E293B",
+      fontSize: 16,
+      fontWeight: "800",
+      color: "#FFFFFF",
     },
 
     typeTextActive: {
-      fontWeight: "700",
+      fontWeight: "800",
+      color: "#FFFFFF",
     },
 
     searchContainer: {
@@ -2445,5 +2642,15 @@ const styles =
 
     countyScroller: {
       width: "100%",
+    },
+
+    formGrid: {
+      flexDirection: "row",
+      gap: 14,
+      marginBottom: 6,
+    },
+
+    formCol: {
+      flex: 1,
     },
   });

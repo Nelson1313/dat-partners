@@ -32,28 +32,35 @@ serve(async (req) => {
 
   try {
     const {
-      id,
-      name,
-      address,
-      phone,
-      email,
-      partner_type,
-    } =
-      await req.json();
+  id,
+  name,
+  address,
+  phone,
+  email,
+  partner_type,
+  tax_number,
+  customer_id,
+  contact,
+  county,
+} =
+  await req.json();
 
-    const supabase =
-      createClient(
-        console.log(
+    console.log(
   "SUPABASE URL:",
   Deno.env.get(
     "SUPABASE_URL"
   )
 );
-        )!,
-        Deno.env.get(
-          "SUPABASE_SERVICE_ROLE_KEY"
-        )!
-      );
+
+const supabase =
+  createClient(
+    Deno.env.get(
+      "SUPABASE_URL"
+    )!,
+    Deno.env.get(
+      "SUPABASE_SERVICE_ROLE_KEY"
+    )!
+  );
 
     const {
   data,
@@ -64,29 +71,15 @@ serve(async (req) => {
       "partners"
     )
     .update({
-  identifier,
-
   name,
-
   address,
-
   phone,
-
   email,
-
   partner_type,
-
   tax_number,
-
   customer_id,
-
   contact,
-
-  postal_code,
-
-  city,
-
-  street,
+  county,
 })
     .eq(
       "id",

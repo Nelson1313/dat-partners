@@ -44,6 +44,7 @@ serve(async (req) => {
   postal_code,
   city,
   street,
+  county,
 } = body;
 
     function cleanAddress(
@@ -147,17 +148,22 @@ serve(async (req) => {
         )
         : null;
 
-    const supabase =
-      createClient(
-        console.log(
-          "SUPABASE_URL:",
-        Deno.env.get(
-          "SUPABASE_URL"
-        )!,
-        Deno.env.get(
-          "SUPABASE_SERVICE_ROLE_KEY"
-        )!
-      );
+    console.log(
+  "SUPABASE URL:",
+  Deno.env.get(
+    "SUPABASE_URL"
+  )
+);
+
+const supabase =
+  createClient(
+    Deno.env.get(
+      "SUPABASE_URL"
+    )!,
+    Deno.env.get(
+      "SUPABASE_SERVICE_ROLE_KEY"
+    )!
+  );
 
     const {
   data,
