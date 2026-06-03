@@ -1564,28 +1564,34 @@ export default function MapScreen() {
                       partnerType === type &&
                       type === "Független" && {
                         backgroundColor:
-                          "rgba(99,212,113,0.10)",
+                          "rgba(99,212,113,0.18)",
 
                         borderColor:
                           "#63D471",
+
+                        borderWidth: 3,
                       },
 
                       partnerType === type &&
                       type === "Márkaszervíz" && {
                         backgroundColor:
-                          "rgba(255,212,0,0.10)",
+                          "rgba(255,212,0,0.18)",
 
                         borderColor:
                           "#FFD400",
+
+                        borderWidth: 3,
                       },
 
                       partnerType === type &&
                       type === "Értékelő" && {
                         backgroundColor:
-                          "rgba(255,92,138,0.10)",
+                          "rgba(255,92,138,0.18)",
 
                         borderColor:
                           "#FF5C8A",
+
+                        borderWidth: 3,
                       },
 
                       type ===
@@ -1608,32 +1614,71 @@ export default function MapScreen() {
                     ]}
                   >
                     <View
-                      style={[
-                        styles.typeDot,
-                        {
-                          backgroundColor:
-                            type ===
-                              "Független"
-                              ? "#63D471"
-                              : type ===
-                                "Márkaszervíz"
-                                ? "#FFD400"
-                                : "#FF5C8A",
-                        },
-                      ]}
-                    />
-
-                    <Text
-                      style={[
-                        styles.typeText,
-
-                        partnerType ===
-                        type &&
-                        styles.typeTextActive,
-                      ]}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        width: "100%",
+                        justifyContent:
+                          "space-between",
+                      }}
                     >
-                      {type}
-                    </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
+                      >
+                        <View
+                          style={[
+                            styles.typeDot,
+                            {
+                              backgroundColor:
+                                type ===
+                                  "Független"
+                                  ? "#63D471"
+                                  : type ===
+                                    "Márkaszervíz"
+                                    ? "#FFD400"
+                                    : "#FF5C8A",
+                            },
+                          ]}
+                        />
+
+                        <Text
+                          style={[
+                            styles.typeText,
+
+                            partnerType ===
+                            type &&
+                            styles.typeTextActive,
+                          ]}
+                        >
+                          {type}
+                        </Text>
+                      </View>
+
+                      {partnerType ===
+                        type && (
+                          <Text
+                            style={{
+                              color:
+                                type ===
+                                  "Független"
+                                  ? "#63D471"
+                                  : type ===
+                                    "Márkaszervíz"
+                                    ? "#FFD400"
+                                    : "#FF5C8A",
+
+                              fontSize: 18,
+                              fontWeight:
+                                "900",
+                            }}
+                          >
+                            ✓
+                          </Text>
+                        )}
+                    </View>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -2166,14 +2211,14 @@ const styles =
     },
 
     saveText: {
-      color: "#FFFFFF",
+      color: "#1B3564",
       fontWeight: "800",
       fontSize: 15,
     },
 
     cancelText: {
       fontWeight: "700",
-      color: "#475569",
+      color: "#FFFFFF",
     },
 
     modalFooter: {
