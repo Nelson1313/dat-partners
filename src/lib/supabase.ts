@@ -9,10 +9,12 @@ import {
 } from "react-native";
 
 const supabaseUrl =
-    "https://nseopolqejpjftjutckn.supabase.co";
+  process.env
+    .EXPO_PUBLIC_SUPABASE_URL!;
 
 const supabaseAnonKey =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zZW9wb2xxZWpwamZ0anV0Y2tuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyOTYwMzUsImV4cCI6MjA5NTg3MjAzNX0.Zz6yR3WEnXQwneTkJEqcX0nHYC-_Xz4V7_W9sGwHAic";
+  process.env
+    .EXPO_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase =
     createClient(
