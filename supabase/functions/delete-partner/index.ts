@@ -10,18 +10,34 @@ const corsHeaders = {
 
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
+
+  "Access-Control-Allow-Methods":
+    "POST, OPTIONS",
 };
 
 serve(async (req) => {
-  if (
-    req.method ===
-    "OPTIONS"
-  ) {
+  // preflight
+  if (req.method === "OPTIONS") {
+    return new Response("ok", {
+      headers: corsHeaders,
+      status: 200,
+    });
+  }
+
+  // csak POST
+  if (req.method !== "POST") {
     return new Response(
-      "ok",
+      JSON.stringify({
+        error:
+          "Method not allowed",
+      }),
       {
-        headers:
-          corsHeaders,
+        status: 405,
+        headers: {
+          ...corsHeaders,
+          "Content-Type":
+            "application/json",
+        },
       }
     );
   }
@@ -53,9 +69,7 @@ serve(async (req) => {
           id
         );
 
-    if (
-      error
-    ) {
+    if (error) {
       throw error;
     }
 
@@ -75,6 +89,10 @@ serve(async (req) => {
   } catch (
     error
   ) {
+    console.error(
+      error
+    );
+
     return new Response(
       JSON.stringify({
         error:
@@ -83,7 +101,6 @@ serve(async (req) => {
       {
         status:
           500,
-
         headers: {
           ...corsHeaders,
           "Content-Type":

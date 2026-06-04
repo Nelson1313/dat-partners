@@ -10,112 +10,97 @@ const corsHeaders = {
 
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
+
+  "Access-Control-Allow-Methods":
+    "POST, OPTIONS",
 };
 
-console.log(
-  "VERSION 2 UPDATE"
-);
 serve(async (req) => {
   // CORS preflight
-  if (
-    req.method ===
-    "OPTIONS"
-  ) {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", {
+      headers: corsHeaders,
+      status: 200,
+    });
+  }
+
+  // csak POST engedélyezett
+  if (req.method !== "POST") {
     return new Response(
-      "ok",
+      JSON.stringify({
+        error:
+          "Method not allowed",
+      }),
       {
-        headers:
-          corsHeaders,
+        status: 405,
+        headers: {
+          ...corsHeaders,
+          "Content-Type":
+            "application/json",
+        },
       }
     );
   }
 
   try {
     const {
-  id,
-  name,
-  address,
-  phone,
-  email,
-  partner_type,
-  tax_number,
-  customer_id,
-  contact,
-  county,
-} =
-  await req.json();
+      id,
+      name,
+      address,
+      phone,
+      email,
+      partner_type,
+      tax_number,
+      customer_id,
+      contact,
+      county,
+    } =
+      await req.json();
 
-    console.log(
-  "SUPABASE URL:",
-  Deno.env.get(
-    "SUPABASE_URL"
-  )
-);
-
-const supabase =
-  createClient(
-    Deno.env.get(
-      "SUPABASE_URL"
-    )!,
-    Deno.env.get(
-      "SUPABASE_SERVICE_ROLE_KEY"
-    )!
-  );
+    const supabase =
+      createClient(
+        Deno.env.get(
+          "SUPABASE_URL"
+        )!,
+        Deno.env.get(
+          "SUPABASE_SERVICE_ROLE_KEY"
+        )!
+      );
 
     const {
-  data,
-  error,
-} =
-  await supabase
-    .from(
-      "partners"
-    )
-    .update({
-  name,
-  address,
-  phone,
-  email,
-  partner_type,
-  tax_number,
-  customer_id,
-  contact,
-  county,
-})
-    .eq(
-      "id",
-      id
-    )
-    .select();
+      data,
+      error,
+    } =
+      await supabase
+        .from(
+          "partners"
+        )
+        .update({
+          name,
+          address,
+          phone,
+          email,
+          partner_type,
+          tax_number,
+          customer_id,
+          contact,
+          county,
+        })
+        .eq(
+          "id",
+          id
+        )
+        .select();
 
-console.log(
-  "UPDATED DATA:",
-  data
-);
-
-console.log(
-  "UPDATE ERROR:",
-  error
-);
-
-if (
-  error
-) {
-  throw error;
-}
-
-if (
-  !data ||
-  data.length === 0
-) {
-  throw new Error(
-    "No rows updated"
-  );
-}
+    if (error) {
+      throw error;
+    }
 
     return new Response(
       JSON.stringify({
         success:
           true,
+        data,
       }),
       {
         headers: {
@@ -140,7 +125,6 @@ if (
       {
         status:
           500,
-
         headers: {
           ...corsHeaders,
           "Content-Type":

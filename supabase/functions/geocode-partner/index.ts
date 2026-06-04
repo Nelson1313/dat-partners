@@ -10,19 +10,31 @@ const corsHeaders = {
 
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
+
+  "Access-Control-Allow-Methods":
+    "POST, OPTIONS",
 };
 
 serve(async (req) => {
-  // preflight
-  if (
-    req.method ===
-    "OPTIONS"
-  ) {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", {
+      headers: corsHeaders,
+      status: 200,
+    });
+  }
+
+  if (req.method !== "POST") {
     return new Response(
-      "ok",
+      JSON.stringify({
+        error: "Method not allowed",
+      }),
       {
-        headers:
-          corsHeaders,
+        status: 405,
+        headers: {
+          ...corsHeaders,
+          "Content-Type":
+            "application/json",
+        },
       }
     );
   }
@@ -31,21 +43,21 @@ serve(async (req) => {
     const body =
       await req.json();
 
-    const {
-  identifier,
-  name,
-  address,
-  phone,
-  email,
-  partner_type,
-  tax_number,
-  customer_id,
-  contact,
-  postal_code,
-  city,
-  street,
-  county,
-} = body;
+  const {
+    identifier,
+    name,
+    address,
+    phone,
+    email,
+    partner_type,
+    tax_number,
+    customer_id,
+    contact,
+    postal_code,
+    city,
+    street,
+    county,
+  } = body;
 
     function cleanAddress(
       address: string
@@ -115,6 +127,11 @@ serve(async (req) => {
         )
       );
 
+      console.log(
+  "QUERY:",
+  query
+);
+
     const geo =
       await fetch(
         `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`,
@@ -127,33 +144,26 @@ serve(async (req) => {
         }
       );
 
-    const data =
-      await geo.json();
+  const geoData =
+  await geo.json();
 
-    const latitude =
-      data?.[0]
-        ?.lat
-        ? Number(
-          data[0]
-            .lat
-        )
-        : null;
+const latitude =
+  geoData?.[0]
+    ?.lat
+    ? Number(
+        geoData[0]
+          .lat
+      )
+    : null;
 
-    const longitude =
-      data?.[0]
-        ?.lon
-        ? Number(
-          data[0]
-            .lon
-        )
-        : null;
-
-    console.log(
-  "SUPABASE URL:",
-  Deno.env.get(
-    "SUPABASE_URL"
-  )
-);
+const longitude =
+  geoData?.[0]
+    ?.lon
+    ? Number(
+        geoData[0]
+          .lon
+      )
+    : null;
 
 const supabase =
   createClient(
@@ -201,6 +211,8 @@ const supabase =
   city,
 
   street,
+
+  county,
 })
     .select();
 
