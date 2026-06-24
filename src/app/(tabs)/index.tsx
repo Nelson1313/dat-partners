@@ -228,12 +228,7 @@ export default function MapScreen() {
     );
 
   const phoneValid =
-    /^(\+36|06)?[\s-]?(20|30|31|50|70)[\s-]?\d{3}[\s-]?\d{4}$/.test(
-      partnerPhone.replace(
-        /\s/g,
-        ""
-      )
-    );
+    partnerPhone.replace(/\D/g, "").length >= 9;
 
   const [
     selectedCounty,
