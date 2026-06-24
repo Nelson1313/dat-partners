@@ -21,7 +21,10 @@ export type Partner = {
     longitude: number;
 
     partner_type?:
-        string;
+        string; // átmenetileg marad
+
+    partner_types?:
+        string[];
 
     tax_number?:
         string;

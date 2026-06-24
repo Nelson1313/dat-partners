@@ -192,11 +192,11 @@ export default function MapScreen() {
   ] = useState("");
 
   const [
-    partnerType,
-    setPartnerType,
-  ] = useState(
-    "Független"
-  );
+    partnerTypes,
+    setPartnerTypes,
+  ] = useState<string[]>([
+    "Független",
+  ]);
 
   const [
     partnerEmail,
@@ -223,9 +223,7 @@ export default function MapScreen() {
   }, []);
 
   const emailValid =
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-      partnerEmail
-    );
+    partnerEmail.trim().length >= 5;
 
   const phoneValid =
     partnerPhone.replace(/\D/g, "").length >= 9;
@@ -245,6 +243,26 @@ export default function MapScreen() {
     "" &&
     phoneValid &&
     emailValid;
+
+  const getPrimaryPartnerType = (types: string[]) => {
+    if (types.includes("Roncsbörze")) {
+      return "Roncsbörze";
+    }
+
+    if (types.includes("Javítói börze")) {
+      return "Javítói börze";
+    }
+
+    if (types.includes("Értékelő")) {
+      return "Értékelő";
+    }
+
+    if (types.includes("Márkaszervíz")) {
+      return "Márkaszervíz";
+    }
+
+    return "Független";
+  };
 
   const handleSavePartner =
     async () => {
@@ -272,8 +290,10 @@ export default function MapScreen() {
               email:
                 partnerEmail,
 
-              partner_type:
-                partnerType,
+              partner_types:
+                partnerTypes,
+
+              partner_type: getPrimaryPartnerType(partnerTypes),
 
               tax_number:
                 partnerTaxNumber,
@@ -300,8 +320,10 @@ export default function MapScreen() {
               email:
                 partnerEmail,
 
-              partner_type:
-                partnerType,
+              partner_types:
+                partnerTypes,
+
+              partner_type: getPrimaryPartnerType(partnerTypes),
 
               tax_number:
                 partnerTaxNumber,
@@ -364,12 +386,11 @@ export default function MapScreen() {
           response.status
         );
 
-        if (
-          !response.ok
-        ) {
+        if (!response.ok) {
+          console.error("FULL RESULT:", result);
+
           throw new Error(
-            result.error ||
-            "Mentés sikertelen"
+            JSON.stringify(result, null, 2)
           );
         }
 
@@ -396,9 +417,12 @@ export default function MapScreen() {
       } catch (
       error
       ) {
-        console.error(
-          "SAVE ERROR:",
-          error
+        console.error("SAVE ERROR:", error);
+
+        alert(
+          error instanceof Error
+            ? error.message
+            : JSON.stringify(error)
         );
 
         alert(
@@ -502,8 +526,7 @@ export default function MapScreen() {
 
         const matchesType =
           selectedType
-            ? partner.partner_type ===
-            selectedType
+            ? partner.partner_types?.includes(selectedType)
             : true;
 
         const matchesCounty =
@@ -729,9 +752,13 @@ export default function MapScreen() {
                     ""
                   );
 
-                  setPartnerType(
-                    partner.partner_type ??
-                    "Független"
+                  setPartnerTypes(
+                    partner.partner_types ??
+                    (
+                      partner.partner_type
+                        ? [partner.partner_type]
+                        : ["Független"]
+                    )
                   );
 
                   setShowPartnerModal(
@@ -936,9 +963,9 @@ export default function MapScreen() {
                               ""
                             );
 
-                            setPartnerType(
-                              "Független"
-                            );
+                            setPartnerTypes([
+                              "Független",
+                            ]);
 
                             setShowPartnerModal(
                               true
@@ -1398,15 +1425,14 @@ export default function MapScreen() {
                   }
                 />
 
-                {partnerEmail !==
-                  "" &&
+                {partnerEmail !== "" &&
                   !emailValid && (
                     <Text
                       style={
                         styles.validationError
                       }
                     >
-                      Hibás email formátum
+                      Legalább 5 karakter szükséges
                     </Text>
                   )}
               </View>
@@ -1559,19 +1585,33 @@ export default function MapScreen() {
                 ].map((type) => (
                   <TouchableOpacity
                     key={type}
-                    onPress={() =>
-                      setPartnerType(
-                        type
-                      )
-                    }
+                    onPress={() => {
+                      if (partnerTypes.includes(type)) {
+
+                        if (partnerTypes.length === 1) return;
+
+                        setPartnerTypes(
+                          partnerTypes.filter(
+                            (t) => t !== type
+                          )
+                        );
+
+                      } else {
+
+                        setPartnerTypes([
+                          ...partnerTypes,
+                          type,
+                        ]);
+
+                      }
+                    }}
                     style={[
                       styles.typeButton,
 
-                      partnerType ===
-                      type &&
+                      partnerTypes.includes(type) &&
                       styles.typeButtonActive,
 
-                      partnerType === type &&
+                      partnerTypes.includes(type) &&
                       type === "Független" && {
                         backgroundColor:
                           "rgba(99,212,113,0.18)",
@@ -1581,19 +1621,19 @@ export default function MapScreen() {
 
                         borderWidth: 3,
                       },
-                      partnerType === type &&
+                      partnerTypes.includes(type) &&
                       type === "Javítói börze" && {
                         borderColor: "#FF8A00",
                         borderWidth: 3,
                       },
 
-                      partnerType === type &&
+                      partnerTypes.includes(type) &&
                       type === "Roncsbörze" && {
                         borderColor: "#8B5CF6",
                         borderWidth: 3,
                       },
 
-                      partnerType === type &&
+                      partnerTypes.includes(type) &&
                       type === "Márkaszervíz" && {
                         backgroundColor:
                           "rgba(255,212,0,0.18)",
@@ -1604,7 +1644,7 @@ export default function MapScreen() {
                         borderWidth: 3,
                       },
 
-                      partnerType === type &&
+                      partnerTypes.includes(type) &&
                       type === "Értékelő" && {
                         backgroundColor:
                           "rgba(255,92,138,0.18)",
@@ -1679,8 +1719,7 @@ export default function MapScreen() {
                           style={[
                             styles.typeText,
 
-                            partnerType ===
-                            type &&
+                            partnerTypes.includes(type) &&
                             styles.typeTextActive,
                           ]}
                         >
@@ -1688,27 +1727,28 @@ export default function MapScreen() {
                         </Text>
                       </View>
 
-                      {partnerType ===
-                        type && (
-                          <Text
-                            style={{
-                              color:
-                                type ===
-                                  "Független"
-                                  ? "#63D471"
-                                  : type ===
-                                    "Márkaszervíz"
-                                    ? "#FFD400"
-                                    : "#FF5C8A",
+                      {partnerTypes.includes(type) && (
+                        <Text
+                          style={{
+                            color:
+                              type === "Független"
+                                ? "#63D471"
+                                : type === "Márkaszervíz"
+                                  ? "#FFD400"
+                                  : type === "Értékelő"
+                                    ? "#FF5C8A"
+                                    : type === "Javítói börze"
+                                      ? "#FF8A00"
+                                      : "#8B5CF6",
 
-                              fontSize: 18,
-                              fontWeight:
-                                "900",
-                            }}
-                          >
-                            ✓
-                          </Text>
-                        )}
+                            fontSize: 18,
+                            fontWeight:
+                              "900",
+                          }}
+                        >
+                          ✓
+                        </Text>
+                      )}
                     </View>
                   </TouchableOpacity>
                 ))}

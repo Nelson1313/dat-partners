@@ -43,21 +43,21 @@ serve(async (req) => {
     const body =
       await req.json();
 
-  const {
-    identifier,
-    name,
-    address,
-    phone,
-    email,
-    partner_type,
-    tax_number,
-    customer_id,
-    contact,
-    postal_code,
-    city,
-    street,
-    county,
-  } = body;
+const {
+  identifier,
+  name,
+  address,
+  phone,
+  email,
+  partner_types,
+  tax_number,
+  customer_id,
+  contact,
+  postal_code,
+  city,
+  street,
+  county,
+} = body;
 
     function cleanAddress(
       address: string
@@ -185,33 +185,33 @@ const supabase =
     )
     .insert({
   identifier,
-
   name,
-
   address,
-
   phone,
-
   email,
-
   latitude,
-
   longitude,
 
-  partner_type,
+  // új mező
+  partner_types,
+
+  partner_type:
+  partner_types?.includes("Roncsbörze")
+    ? "Roncsbörze"
+    : partner_types?.includes("Javítói börze")
+      ? "Javítói börze"
+      : partner_types?.includes("Értékelő")
+        ? "Értékelő"
+        : partner_types?.includes("Márkaszervíz")
+          ? "Márkaszervíz"
+          : "Független",
 
   tax_number,
-
   customer_id,
-
   contact,
-
   postal_code,
-
   city,
-
   street,
-
   county,
 })
     .select();

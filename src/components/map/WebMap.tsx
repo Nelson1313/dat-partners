@@ -29,6 +29,7 @@ type Props = {
         latitude: number;
         longitude: number;
         partner_type?: string;
+        partner_types?: string[];
     }
     | null;
 };
@@ -133,15 +134,19 @@ export default function WebMap({
                             <View
                                 style={[
                                     styles.marker,
-                                    partner.partner_type === "Független"
-                                        ? styles.markerIndependent
-                                        : partner.partner_type === "Márkaszervíz"
-                                            ? styles.markerBrand
-                                            : partner.partner_type === "Értékelő"
+                                    partner.partner_types?.includes("Roncsbörze")
+                                        ? styles.markerScrap
+
+                                        : partner.partner_types?.includes("Javítói börze")
+                                            ? styles.markerExchange
+
+                                            : partner.partner_types?.includes("Értékelő")
                                                 ? styles.markerEvaluator
-                                                : partner.partner_type === "Javítói börze"
-                                                    ? styles.markerExchange
-                                                    : styles.markerScrap,
+
+                                                : partner.partner_types?.includes("Márkaszervíz")
+                                                    ? styles.markerBrand
+
+                                                    : styles.markerIndependent
                                 ]}
                             >
                                 <View

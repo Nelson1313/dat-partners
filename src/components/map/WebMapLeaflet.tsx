@@ -32,6 +32,7 @@ type Partner = {
     county?: string;
     email?: string;
     partner_type?: string;
+    partner_types?: string[];
 };
 
 type Props = {
@@ -41,18 +42,22 @@ type Props = {
 
 
 function getMarkerIcon(
-    type?: string
+    types?: string[]
 ) {
     const color =
-        type === "Független"
-            ? "#63D471"
-            : type === "Márkaszervíz"
-                ? "#FFD400"
-                : type === "Értékelő"
+        types?.includes("Roncsbörze")
+            ? "#8B5CF6"
+
+            : types?.includes("Javítói börze")
+                ? "#FF8A00"
+
+                : types?.includes("Értékelő")
                     ? "#FF5C8A"
-                    : type === "Javítói börze"
-                        ? "#FF8A00"
-                        : "#8B5CF6";
+
+                    : types?.includes("Márkaszervíz")
+                        ? "#FFD400"
+
+                        : "#63D471";
 
     return L.divIcon({
         className:
@@ -243,7 +248,7 @@ export default function WebMapLeaflet({
                             partner.longitude,
                         ]}
                         icon={getMarkerIcon(
-                            partner.partner_type
+                            partner.partner_types
                         )}
                         ref={(ref) => {
                             markerRefs.current[

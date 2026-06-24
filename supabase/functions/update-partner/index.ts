@@ -49,7 +49,7 @@ serve(async (req) => {
       address,
       phone,
       email,
-      partner_type,
+      partner_types,
       tax_number,
       customer_id,
       contact,
@@ -76,16 +76,23 @@ serve(async (req) => {
           "partners"
         )
         .update({
-          name,
-          address,
-          phone,
-          email,
-          partner_type,
-          tax_number,
-          customer_id,
-          contact,
-          county,
-        })
+  name,
+  address,
+  phone,
+  email,
+
+  // új
+  partner_types,
+
+  // átmeneti kompatibilitás
+  partner_type:
+    partner_types?.[0] ?? null,
+
+  tax_number,
+  customer_id,
+  contact,
+  county,
+})
         .eq(
           "id",
           id

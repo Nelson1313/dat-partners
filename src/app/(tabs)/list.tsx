@@ -9,6 +9,8 @@ import {
     View,
 } from "react-native";
 
+
+
 import {
     Mail,
     MapPin,
@@ -31,6 +33,9 @@ import {
     setSelectedPartner,
 } from "../../store/mapStore";
 
+import {
+    getPartnerColor
+} from "../../utils/partnerTypes";
 export default function ListScreen() {
     const [search, setSearch] =
         useState("");
@@ -118,14 +123,9 @@ export default function ListScreen() {
                     );
                 })
                 .filter((partner) => {
-                    const partnerType =
-                        partner.partner_type ??
-                        "Független";
-
                     const matchesType =
                         selectedType
-                            ? partnerType ===
-                            selectedType
+                            ? partner.partner_types?.includes(selectedType) ?? false
                             : true;
 
                     const matchesCounty =
@@ -356,6 +356,8 @@ export default function ListScreen() {
                             "Független",
                             "Márkaszervíz",
                             "Értékelő",
+                            "Javítói börze",
+                            "Roncsbörze",
                         ].map((type) => (
                             <TouchableOpacity
                                 key={type}
@@ -388,16 +390,36 @@ export default function ListScreen() {
                                             "#FF5C8A",
                                     },
 
+                                    type === "Javítói börze" && {
+                                        borderColor: "#FF8A00",
+                                    },
+
+                                    type === "Roncsbörze" && {
+                                        borderColor: "#8B5CF6",
+                                    },
+
+
+
                                     selectedType ===
                                     type && {
                                         backgroundColor:
-                                            type ===
-                                                "Független"
-                                                ? "#63D471"
-                                                : type ===
-                                                    "Márkaszervíz"
-                                                    ? "#FFD400"
-                                                    : "#FF5C8A",
+                                            type === "Független"
+                                                ?
+                                                "#63D471"
+                                                :
+                                                type === "Márkaszervíz"
+                                                    ?
+                                                    "#FFD400"
+                                                    :
+                                                    type === "Értékelő"
+                                                        ?
+                                                        "#FF5C8A"
+                                                        :
+                                                        type === "Javítói börze"
+                                                            ?
+                                                            "#FF8A00"
+                                                            :
+                                                            "#8B5CF6",
                                     },
                                 ]}
                             >
@@ -504,16 +526,11 @@ export default function ListScreen() {
                             <View
                                 style={[
                                     styles.typeBar,
-
-                                    item.partner_type === "Független"
-                                        ? { backgroundColor: "#63D471" }
-                                        : item.partner_type === "Márkaszervíz"
-                                            ? { backgroundColor: "#FFD400" }
-                                            : item.partner_type === "Értékelő"
-                                                ? { backgroundColor: "#FF5C8A" }
-                                                : item.partner_type === "Javítói börze"
-                                                    ? { backgroundColor: "#FF8A00" }
-                                                    : { backgroundColor: "#8B5CF6" }
+                                    {
+                                        backgroundColor: getPartnerColor(
+                                            item.partner_types
+                                        ),
+                                    },
                                 ]}
                             />
 
@@ -534,25 +551,38 @@ export default function ListScreen() {
                                     </Text>
 
                                     <View
-                                        style={[
-                                            styles.partnerTypeBadge,
-                                            item.partner_type ===
-                                                "Független"
-                                                ? styles.independentBadge
-                                                : item.partner_type ===
-                                                    "Márkaszervíz"
-                                                    ? styles.brandBadge
-                                                    : styles.evaluatorBadge,
-                                        ]}
+                                        style={{
+                                            flexDirection: "row",
+                                            flexWrap: "wrap",
+                                            gap: 8,
+                                            marginTop: 8,
+                                            marginBottom: 4,
+                                        }}
                                     >
-                                        <Text
-                                            style={
-                                                styles.partnerTypeText
-                                            }
-                                        >
-                                            {item.partner_type ??
-                                                "Független"}
-                                        </Text>
+                                        {(item.partner_types ?? []).map(
+                                            (type) => (
+                                                <View
+                                                    key={type}
+                                                    style={[
+                                                        styles.partnerTypeBadge,
+                                                        {
+                                                            backgroundColor:
+                                                                getPartnerColor([
+                                                                    type,
+                                                                ]),
+                                                        },
+                                                    ]}
+                                                >
+                                                    <Text
+                                                        style={
+                                                            styles.partnerTypeText
+                                                        }
+                                                    >
+                                                        {type}
+                                                    </Text>
+                                                </View>
+                                            )
+                                        )}
                                     </View>
 
                                     <View style={styles.infoRow}>
