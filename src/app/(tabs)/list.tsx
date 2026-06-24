@@ -505,22 +505,15 @@ export default function ListScreen() {
                                 style={[
                                     styles.typeBar,
 
-                                    item.partner_type ===
-                                        "Független"
-                                        ? {
-                                            backgroundColor:
-                                                "#63D471",
-                                        }
-                                        : item.partner_type ===
-                                            "Márkaszervíz"
-                                            ? {
-                                                backgroundColor:
-                                                    "#FFD400",
-                                            }
-                                            : {
-                                                backgroundColor:
-                                                    "#FF5C8A",
-                                            },
+                                    item.partner_type === "Független"
+                                        ? { backgroundColor: "#63D471" }
+                                        : item.partner_type === "Márkaszervíz"
+                                            ? { backgroundColor: "#FFD400" }
+                                            : item.partner_type === "Értékelő"
+                                                ? { backgroundColor: "#FF5C8A" }
+                                                : item.partner_type === "Javítói börze"
+                                                    ? { backgroundColor: "#FF8A00" }
+                                                    : { backgroundColor: "#8B5CF6" }
                                 ]}
                             />
 

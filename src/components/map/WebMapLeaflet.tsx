@@ -44,13 +44,15 @@ function getMarkerIcon(
     type?: string
 ) {
     const color =
-        type ===
-            "Független"
+        type === "Független"
             ? "#63D471"
-            : type ===
-                "Márkaszervíz"
+            : type === "Márkaszervíz"
                 ? "#FFD400"
-                : "#FF5C8A";
+                : type === "Értékelő"
+                    ? "#FF5C8A"
+                    : type === "Javítói börze"
+                        ? "#FF8A00"
+                        : "#8B5CF6";
 
     return L.divIcon({
         className:

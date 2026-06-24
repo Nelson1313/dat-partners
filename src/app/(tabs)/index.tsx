@@ -1112,6 +1112,8 @@ export default function MapScreen() {
               "Független",
               "Márkaszervíz",
               "Értékelő",
+              "Javítói börze",
+              "Roncsbörze",
             ].map((type) => (
               <TouchableOpacity
                 key={type}
@@ -1143,16 +1145,25 @@ export default function MapScreen() {
                       "#FF5C8A",
                   },
 
-                  selectedType ===
-                  type && {
+                  type === "Javítói börze" && {
+                    borderColor: "#FF8A00",
+                  },
+
+                  type === "Roncsbörze" && {
+                    borderColor: "#8B5CF6",
+                  },
+
+                  selectedType === type && {
                     backgroundColor:
-                      type ===
-                        "Független"
+                      type === "Független"
                         ? "#63D471"
-                        : type ===
-                          "Márkaszervíz"
+                        : type === "Márkaszervíz"
                           ? "#FFD400"
-                          : "#FF5C8A",
+                          : type === "Értékelő"
+                            ? "#FF5C8A"
+                            : type === "Javítói börze"
+                              ? "#FF8A00"
+                              : "#8B5CF6",
                   },
                 ]}
               >
@@ -1161,13 +1172,15 @@ export default function MapScreen() {
                     styles.legendText,
                     {
                       color:
-                        type ===
-                          "Független"
+                        type === "Független"
                           ? "#63D471"
-                          : type ===
-                            "Márkaszervíz"
+                          : type === "Márkaszervíz"
                             ? "#FFD400"
-                            : "#FF5C8A",
+                            : type === "Értékelő"
+                              ? "#FF5C8A"
+                              : type === "Javítói börze"
+                                ? "#FF8A00"
+                                : "#8B5CF6",
                     },
 
                     selectedType ===
@@ -1546,6 +1559,8 @@ export default function MapScreen() {
                   "Független",
                   "Márkaszervíz",
                   "Értékelő",
+                  "Javítói börze",
+                  "Roncsbörze",
                 ].map((type) => (
                   <TouchableOpacity
                     key={type}
@@ -1569,6 +1584,17 @@ export default function MapScreen() {
                         borderColor:
                           "#63D471",
 
+                        borderWidth: 3,
+                      },
+                      partnerType === type &&
+                      type === "Javítói börze" && {
+                        borderColor: "#FF8A00",
+                        borderWidth: 3,
+                      },
+
+                      partnerType === type &&
+                      type === "Roncsbörze" && {
+                        borderColor: "#8B5CF6",
                         borderWidth: 3,
                       },
 
@@ -1611,6 +1637,14 @@ export default function MapScreen() {
                         borderColor:
                           "#FF5C8A",
                       },
+
+                      type === "Javítói börze" && {
+                        borderColor: "#FF8A00",
+                      },
+
+                      type === "Roncsbörze" && {
+                        borderColor: "#8B5CF6",
+                      },
                     ]}
                   >
                     <View
@@ -1633,13 +1667,15 @@ export default function MapScreen() {
                             styles.typeDot,
                             {
                               backgroundColor:
-                                type ===
-                                  "Független"
+                                type === "Független"
                                   ? "#63D471"
-                                  : type ===
-                                    "Márkaszervíz"
+                                  : type === "Márkaszervíz"
                                     ? "#FFD400"
-                                    : "#FF5C8A",
+                                    : type === "Értékelő"
+                                      ? "#FF5C8A"
+                                      : type === "Javítói börze"
+                                        ? "#FF8A00"
+                                        : "#8B5CF6",
                             },
                           ]}
                         />

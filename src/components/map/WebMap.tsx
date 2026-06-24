@@ -133,13 +133,15 @@ export default function WebMap({
                             <View
                                 style={[
                                     styles.marker,
-                                    partner.partner_type ===
-                                        "Független"
+                                    partner.partner_type === "Független"
                                         ? styles.markerIndependent
-                                        : partner.partner_type ===
-                                            "Márkaszervíz"
+                                        : partner.partner_type === "Márkaszervíz"
                                             ? styles.markerBrand
-                                            : styles.markerEvaluator,
+                                            : partner.partner_type === "Értékelő"
+                                                ? styles.markerEvaluator
+                                                : partner.partner_type === "Javítói börze"
+                                                    ? styles.markerExchange
+                                                    : styles.markerScrap,
                                 ]}
                             >
                                 <View
@@ -223,5 +225,13 @@ const styles =
         markerEvaluator: {
             backgroundColor:
                 "#FF5C8A",
+        },
+
+        markerExchange: {
+            backgroundColor: "#FF8A00",
+        },
+
+        markerScrap: {
+            backgroundColor: "#8B5CF6",
         },
     });
