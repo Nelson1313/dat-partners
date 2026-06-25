@@ -6,11 +6,12 @@ export type Partner = {
     id: string;
 
     identifier?:
-        string;
+    string;
 
     name: string;
 
     address: string;
+    address_note?: string;
 
     phone: string;
 
@@ -21,73 +22,73 @@ export type Partner = {
     longitude: number;
 
     partner_type?:
-        string; // átmenetileg marad
+    string; // átmenetileg marad
 
     partner_types?:
-        string[];
+    string[];
 
     tax_number?:
-        string;
+    string;
 
     customer_id?:
-        string;
+    string;
 
     contact?:
-        string;
+    string;
 
     county?:
-        string;
+    string;
 
     postal_code?:
-        string;
+    string;
 
     city?:
-        string;
+    string;
 
     street?:
-        string;
+    string;
 };
 
 type PartnerState = {
     partners: Partner[];
     loading: boolean;
     fetchPartners:
-        () => Promise<void>;
+    () => Promise<void>;
 };
 
 export const
-usePartnersStore =
-create<PartnerState>()(
-(set) => ({
-    partners: [],
-    loading: false,
+    usePartnersStore =
+        create<PartnerState>()(
+            (set) => ({
+                partners: [],
+                loading: false,
 
-    fetchPartners:
-    async () => {
+                fetchPartners:
+                    async () => {
 
-        const {
-            data,
-            error,
-        } =
-        await supabase
-            .from(
-                "partners"
-            )
-            .select("*");
+                        const {
+                            data,
+                            error,
+                        } =
+                            await supabase
+                                .from(
+                                    "partners"
+                                )
+                                .select("*");
 
-        console.log(
-            "PARTNERS:",
-            data
-        );
+                        console.log(
+                            "PARTNERS:",
+                            data
+                        );
 
-        console.log(
-            "ERROR:",
-            error
-        );
+                        console.log(
+                            "ERROR:",
+                            error
+                        );
 
-        set({
-            partners:
-                data ?? [],
-        });
-    },
-}));
+                        set({
+                            partners:
+                                data ?? [],
+                        });
+                    },
+            }));

@@ -43,21 +43,22 @@ serve(async (req) => {
     const body =
       await req.json();
 
-const {
-  identifier,
-  name,
-  address,
-  phone,
-  email,
-  partner_types,
-  tax_number,
-  customer_id,
-  contact,
-  postal_code,
-  city,
-  street,
-  county,
-} = body;
+    const {
+      identifier,
+      name,
+      address,
+      address_note,
+      phone,
+      email,
+      partner_types,
+      tax_number,
+      customer_id,
+      contact,
+      postal_code,
+      city,
+      street,
+      county,
+    } = body;
 
     function cleanAddress(
       address: string
@@ -127,10 +128,10 @@ const {
         )
       );
 
-      console.log(
-  "QUERY:",
-  query
-);
+    console.log(
+      "QUERY:",
+      query
+    );
 
     const geo =
       await fetch(
@@ -144,102 +145,103 @@ const {
         }
       );
 
-  const geoData =
-  await geo.json();
+    const geoData =
+      await geo.json();
 
-const latitude =
-  geoData?.[0]
-    ?.lat
-    ? Number(
-        geoData[0]
-          .lat
-      )
-    : null;
+    const latitude =
+      geoData?.[0]
+        ?.lat
+        ? Number(
+          geoData[0]
+            .lat
+        )
+        : null;
 
-const longitude =
-  geoData?.[0]
-    ?.lon
-    ? Number(
-        geoData[0]
-          .lon
-      )
-    : null;
+    const longitude =
+      geoData?.[0]
+        ?.lon
+        ? Number(
+          geoData[0]
+            .lon
+        )
+        : null;
 
-const supabase =
-  createClient(
-    Deno.env.get(
-      "SUPABASE_URL"
-    )!,
-    Deno.env.get(
-      "SUPABASE_SERVICE_ROLE_KEY"
-    )!
-  );
+    const supabase =
+      createClient(
+        Deno.env.get(
+          "SUPABASE_URL"
+        )!,
+        Deno.env.get(
+          "SUPABASE_SERVICE_ROLE_KEY"
+        )!
+      );
 
     const {
-  data,
-  error,
-} =
-  await supabase
-    .from(
-      "partners"
-    )
-    .insert({
-  identifier,
-  name,
-  address,
-  phone,
-  email,
-  latitude,
-  longitude,
+      data,
+      error,
+    } =
+      await supabase
+        .from(
+          "partners"
+        )
+        .insert({
+          identifier,
+          name,
+          address,
+          phone,
+          email,
+          latitude,
+          longitude,
+          address_note,
 
-  // új mező
-  partner_types,
+          // új mező
+          partner_types,
 
-  partner_type:
-  partner_types?.includes("Roncsbörze")
-    ? "Roncsbörze"
-    : partner_types?.includes("Javítói börze")
-      ? "Javítói börze"
-      : partner_types?.includes("Értékelő")
-        ? "Értékelő"
-        : partner_types?.includes("Márkaszervíz")
-          ? "Márkaszervíz"
-          : "Független",
+          partner_type:
+            partner_types?.includes("Roncsbörze")
+              ? "Roncsbörze"
+              : partner_types?.includes("Javítói börze")
+                ? "Javítói börze"
+                : partner_types?.includes("Értékelő")
+                  ? "Értékelő"
+                  : partner_types?.includes("Márkaszervíz")
+                    ? "Márkaszervíz"
+                    : "Független",
 
-  tax_number,
-  customer_id,
-  contact,
-  postal_code,
-  city,
-  street,
-  county,
-})
-    .select();
+          tax_number,
+          customer_id,
+          contact,
+          postal_code,
+          city,
+          street,
+          county,
+        })
+        .select();
 
-console.log(
-  "INSERTED DATA:",
-  data
-);
+    console.log(
+      "INSERTED DATA:",
+      data
+    );
 
-console.log(
-  "INSERT ERROR:",
-  error
-);
+    console.log(
+      "INSERT ERROR:",
+      error
+    );
 
-if (
-  error
-) {
-  throw error;
-}
+    if (
+      error
+    ) {
+      throw error;
+    }
 
-if (
-  !data ||
-  data.length === 0
-) {
-  throw new Error(
-    "Insert failed"
-  );
-}
+    if (
+      !data ||
+      data.length === 0
+    ) {
+      throw new Error(
+        "Insert failed"
+      );
+    }
 
     return new Response(
       JSON.stringify({
@@ -255,7 +257,7 @@ if (
       }
     );
   } catch (
-    error
+  error
   ) {
     return new Response(
       JSON.stringify({

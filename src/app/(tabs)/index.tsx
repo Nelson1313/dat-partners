@@ -94,6 +94,8 @@ export default function MapScreen() {
           ""
         );
 
+        setPartnerAddressNote("");
+
         setPartnerPhone(
           ""
         );
@@ -184,6 +186,11 @@ export default function MapScreen() {
   const [
     partnerAddress,
     setPartnerAddress,
+  ] = useState("");
+
+  const [
+    partnerAddressNote,
+    setPartnerAddressNote,
   ] = useState("");
 
   const [
@@ -284,6 +291,9 @@ export default function MapScreen() {
               address:
                 partnerAddress,
 
+              address_note:
+                partnerAddressNote,
+
               phone:
                 partnerPhone,
 
@@ -310,6 +320,9 @@ export default function MapScreen() {
             : {
               name:
                 partnerName,
+
+              address_note:
+                partnerAddressNote,
 
               address:
                 partnerAddress,
@@ -402,6 +415,8 @@ export default function MapScreen() {
         setPartnerAddress(
           ""
         );
+
+        setPartnerAddressNote("");
 
         setPartnerPhone(
           ""
@@ -722,6 +737,10 @@ export default function MapScreen() {
                     partner.address
                   );
 
+                  setPartnerAddressNote(
+                    partner.address_note || ""
+                  );
+
                   setPartnerPhone(
                     partner.phone ||
                     ""
@@ -954,6 +973,8 @@ export default function MapScreen() {
                             setPartnerAddress(
                               ""
                             );
+
+                            setPartnerAddressNote("");
 
                             setPartnerPhone(
                               ""
@@ -1371,6 +1392,21 @@ export default function MapScreen() {
                   onChangeText={
                     setPartnerAddress
                   }
+                />
+              </View>
+
+              <View style={styles.inputWrap}>
+                <MapPin
+                  size={18}
+                  color="#64748B"
+                />
+
+                <TextInput
+                  placeholder="Megközelítési információ"
+                  placeholderTextColor="#94A3B8"
+                  style={styles.input}
+                  value={partnerAddressNote}
+                  onChangeText={setPartnerAddressNote}
                 />
               </View>
 

@@ -32,6 +32,7 @@ type Partner = {
     county?: string;
     email?: string;
     partner_type?: string;
+    address_note?: string;
     partner_types?: string[];
 };
 
@@ -321,9 +322,28 @@ export default function WebMapLeaflet({
                                         />
                                     </div>
 
-                                    <span className="popup-address-text">
-                                        {partner.address}
-                                    </span>
+                                    <div
+                                        style={{
+                                            flex: 1,
+                                        }}
+                                    >
+                                        <div className="popup-address-text">
+                                            {partner.address}
+                                        </div>
+
+                                        {partner.address_note && (
+                                            <div
+                                                style={{
+                                                    marginTop: 4,
+                                                    fontSize: 12,
+                                                    color: "#64748B",
+                                                    lineHeight: "16px",
+                                                }}
+                                            >
+                                                {partner.address_note}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {partner.phone && (
