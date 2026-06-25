@@ -229,11 +229,8 @@ export default function MapScreen() {
     fetchPartners();
   }, []);
 
-  const emailValid =
-    partnerEmail.trim().length >= 5;
-
-  const phoneValid =
-    partnerPhone.replace(/\D/g, "").length >= 9;
+  const canSavePartner =
+    partnerAddress.trim() !== "";
 
   const [
     selectedCounty,
@@ -242,14 +239,6 @@ export default function MapScreen() {
     useState<
       string | null
     >(null);
-
-  const canSavePartner =
-    partnerName.trim() !==
-    "" &&
-    partnerAddress.trim() !==
-    "" &&
-    phoneValid &&
-    emailValid;
 
   const getPrimaryPartnerType = (types: string[]) => {
     if (types.includes("Roncsbörze")) {
@@ -1461,16 +1450,6 @@ export default function MapScreen() {
                   }
                 />
 
-                {partnerEmail !== "" &&
-                  !emailValid && (
-                    <Text
-                      style={
-                        styles.validationError
-                      }
-                    >
-                      Legalább 5 karakter szükséges
-                    </Text>
-                  )}
               </View>
 
               <View style={styles.formGrid}>
@@ -1595,7 +1574,7 @@ export default function MapScreen() {
                     textAlign: "center",
                   }}
                 >
-                  Minden mező kitöltése kötelező!
+                  A cím megadása kötelező!
                 </Text>
               )}
 
