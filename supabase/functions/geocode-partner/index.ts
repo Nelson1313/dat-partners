@@ -256,15 +256,12 @@ serve(async (req) => {
         },
       }
     );
-  } catch (
-  error
-  ) {
+  } catch (error) {
+    console.error(error);
+
     return new Response(
       JSON.stringify({
-        error:
-          String(
-            error
-          ),
+        error,
       }),
       {
         status:
