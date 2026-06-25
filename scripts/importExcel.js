@@ -151,7 +151,7 @@ async function run() {
         XLSX.readFile(
             path.join(
                 __dirname,
-                "../javító partnerek lista_javítási kalk. és járműértékelő.xlsx"
+                "../CarValue kereskedők_frissített lista.xlsx"
             )
         );
 
